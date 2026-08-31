@@ -1,21 +1,63 @@
-<<<<<<< HEAD
-# cutting_edge
+# Cutting Edge — Salon Management & Booking System
 
-A new Flutter project.
+Integrated prototype developed for ITC327W (Work Integrated Learning), Central University of Technology, Free State — Faculty of Engineering, Built Environment and Information Technology.
+
+A Flutter mobile application and an ASP.NET web application, connected to a shared Supabase backend, built for Cutting Edge to manage salon bookings, services, and scheduling.
+
+## Team — Framework Fanatics
+
+| Name | Student Number | Role |
+|---|---|---|
+| Goitse Kgwele    | 221050663 | [role] |
+| Thabang Zitha    | 223007074 | [role] |
+| Yamkela Mazamani | 224007421 | [role] |
+| Nyakallo Pali    | 223060226 | [role] |
+| Bennet Linda     | 224004294 | [role] |
+
+## Repository Structure
+
+```
+Group-B-/
+├── mobile/     Flutter mobile application
+├── web/        ASP.NET web application
+├── docs/       SRS, feasibility study, risk register, MS Project schedule
+└── README.md
+```
+
+## Tech Stack
+
+- **Mobile:** Flutter
+- **Web:** ASP.NET Core
+- **Backend/Database:** Supabase (PostgreSQL)
+- **Project management:** Microsoft Project
+- **Version control:** GitHub
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Mobile (Flutter)
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+### Web (ASP.NET)
+```bash
+cd web
+dotnet restore
+dotnet run
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Environment variables
+Both apps require a Supabase URL and anon key. Copy `.env.example` to `.env` in each folder and fill in your own values — **never commit real keys or the Supabase service-role key.**
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# Group-B-
->>>>>>> 37908950f4bc4e2f33ccee9d7c2446e97bbd507f
+## Documentation
+
+Full project documentation is in [`docs/`](./docs), including:
+- Software Requirements Specification (SRS)
+- Feasibility study and risk register
+- Microsoft Project schedule
+
+## Project Status
+
+Prototype in development as part of ITC327W, 2026. This is an educational prototype — not intended for production use. Known limitations and incomplete functions are documented in `docs/`.
