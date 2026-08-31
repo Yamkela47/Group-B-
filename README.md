@@ -20,7 +20,6 @@ A Flutter mobile application and an ASP.NET web application, connected to a shar
 Group-B-/
 ├── mobile/     Flutter mobile application
 ├── web/        ASP.NET web application
-├── docs/       SRS, feasibility study, risk register, MS Project schedule
 └── README.md
 ```
 
@@ -29,7 +28,6 @@ Group-B-/
 - **Mobile:** Flutter
 - **Web:** ASP.NET Core
 - **Backend/Database:** Supabase (PostgreSQL)
-- **Project management:** Microsoft Project
 - **Version control:** GitHub
 
 ## Getting Started
@@ -50,13 +48,6 @@ dotnet run
 
 ### Environment variables
 Both apps require a Supabase URL and anon key. Copy `.env.example` to `.env` in each folder and fill in your own values — **never commit real keys or the Supabase service-role key.**
-
-## Documentation
-
-Full project documentation is in [`docs/`](./docs), including:
-- Software Requirements Specification (SRS)
-- Feasibility study and risk register
-- Microsoft Project schedule
 
 ## Project Status
 
