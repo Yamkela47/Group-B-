@@ -18,7 +18,7 @@ A Flutter mobile application and an ASP.NET web application, connected to a shar
 
 ```
 Group-B-/
-├── doc/         Documentation
+├── doc/        Documentation
 ├── mobile/     Flutter mobile application
 ├── web/        ASP.NET web application
 └── README.md
