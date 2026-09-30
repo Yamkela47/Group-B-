@@ -52,4 +52,4 @@ Both apps require a Supabase URL and anon key. Copy `.env.example` to `.env` in 
 
 ## Project Status
 
-Prototype in development as part of ITC327W, 2026. This is an educational prototype — not intended for production use. Known limitations and incomplete functions are documented in `docs/`.
+Phase 2 completed. Phase 3 development, integration and testing are currently in progress for ITC327W, 2026.
