@@ -1,0 +1,322 @@
+﻿@model List<CuttingEdge.ManagerPortal.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <h1>Bookings</h1>
+    <p class="subtitle">All Bookings</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Filters -->
+<div class="filters-row">
+    <form method="get" asp-action="Index" class="filters-form">
+        <div class="filter-group">
+            <label>Search</label>
+            <input type="text" name="search" class="form-control"
+                   placeholder="customer / booking" value="@ViewBag.SearchFilter" />
+        </div>
+
+        <div class="filter-group">
+            <label>Status</label>
+            <select name="status" class="form-control">
+                <option value="">All</option>
+                <option value="Completed" selected="@(ViewBag.StatusFilter == "Completed")">Completed</option>
+                <option value="Incomplete" selected="@(ViewBag.StatusFilter == "Incomplete")">Incomplete</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control" value="@ViewBag.DateFilter" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a asp-action="Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Bookings Table -->
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date/Time</th>
+                <th>Customer</th>
+                <th>Service</th>
+                <th>Stylist</th>
+                <th>Price (R)</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td>@booking.AppointmentDate.ToString("dd MMM") @booking.StartTime.ToString(@"hh\:mm")</td>
+                        <td>@booking.Customer?.FullName</td>
+                        <td>@booking.Service?.Name</td>
+                        <td>@booking.Stylist?.Profile?.FullName</td>
+                        <td>@booking.Service?.Price.ToString("N2")</td>
+                        <td>@booking.PaymentMethod?.MethodName</td>
+                        <td>
+                            <span class="badge badge-@(booking.Status.ToLower())">
+                                @booking.Status
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@booking.BookingId"
+                               class="btn btn-sm btn-outline">View Details</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center">No bookings found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+        .page-header h1 {
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .page-header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+    .filters-row {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .filters-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .filter-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 13px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .btn-sm {
+        padding: 7px 16px;
+        font-size: 13px;
+    }
+
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #d4af37;
+        color: #d4af37;
+    }
+
+        .btn-outline:hover {
+            background-color: #d4af37;
+            color: #0d0d0d;
+            text-decoration: none;
+        }
+
+    .table-container {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .data-table thead {
+            background-color: #0d0d0d;
+        }
+
+        .data-table th {
+            color: #d4af37;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid #333;
+        }
+
+        .data-table td {
+            color: #ddd;
+            font-size: 14px;
+            padding: 16px;
+            border-bottom: 1px solid #222;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #222;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .text-center {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* ===== Status Badges ===== */
+    .badge {
+        display: inline-block;
+        padding: 6px 18px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: capitalize;
+        min-width: 100px;
+        text-align: center;
+        letter-spacing: 0.3px;
+    }
+
+    /* Completed — green border + green text */
+    .badge-completed {
+        background-color: rgba(40, 167, 69, 0.08);
+        color: #28a745;
+        border: 2px solid #28a745;
+    }
+
+    /* Incomplete — gold/yellow border + gold text */
+    .badge-incomplete {
+        background-color: rgba(212, 175, 55, 0.08);
+        color: #d4af37;
+        border: 2px solid #d4af37;
+    }
+
+    /* Fallback for any other status value */
+    .badge-pending,
+    .badge-confirmed,
+    .badge-cancelled {
+        background-color: rgba(108, 117, 125, 0.15);
+        color: #888;
+        border: 2px solid #555;
+    }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

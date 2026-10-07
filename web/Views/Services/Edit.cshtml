@@ -1,0 +1,563 @@
+﻿@model CuttingEdge.ManagerPortal.Models.Service
+
+@{
+    ViewData["Title"] = "Edit Service";
+    Layout = "_Layout";
+
+    var stylists = ViewBag.Stylists as List<CuttingEdge.ManagerPortal.Models.Stylist>;
+    var allServices = ViewBag.AllServices as List<CuttingEdge.ManagerPortal.Models.Service>;
+}
+
+<div class="page-header">
+    <div>
+        <p class="breadcrumb">Services & Promotions > Edit Service</p>
+        <h1>Edit Service</h1>
+        <p class="subtitle">Update the details of your salon service below.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline">← Back to Services</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="edit-grid">
+
+    <!-- Left: Services list -->
+    <div class="services-list-card">
+        <h2>Services</h2>
+
+        @if (allServices != null && allServices.Any())
+        {
+            <div class="services-list">
+                @foreach (var svc in allServices)
+                {
+                    <a asp-action="Edit" asp-route-id="@svc.ServiceId"
+                       class="service-list-item @(svc.ServiceId == Model.ServiceId ? "active" : "")">
+                        <span class="service-list-name">@svc.Name</span>
+                        <span class="service-list-edit">Edit</span>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="empty-hint">No services yet.</p>
+        }
+    </div>
+
+    <!-- Right: Edit form -->
+    <div class="edit-form-card">
+        <form asp-action="Edit" asp-route-id="@Model.ServiceId" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ServiceId" />
+            <input type="hidden" asp-for="CreatedAt" />
+
+            <h2 class="form-title">Edit Service Details</h2>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Name <span class="required">*</span></label>
+                    <input asp-for="Name" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <input type="text" class="form-control" value="Hair Cut & Coloring" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price (R) <span class="required">*</span></label>
+                    <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Duration <span class="required">*</span></label>
+                    <input asp-for="DurationMinutes" type="number" min="1" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description <span class="required">*</span></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Assigned Stylists <span class="required">*</span></label>
+                <div class="stylist-chips">
+                    @if (stylists != null)
+                    {
+                        @foreach (var stylist in stylists)
+                        {
+                            <label class="chip-label">
+                                <input type="checkbox" name="StylistIds" value="@stylist.StylistId" checked />
+                                <span class="chip">@stylist.Profile?.FullName</span>
+                            </label>
+                        }
+                    }
+                    <button type="button" class="chip-select-all" onclick="selectAllStylists()">+ Select all</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Service Image (Optional)</label>
+                <div class="upload-box">
+                    <span class="upload-icon">☁</span>
+                    <p class="upload-text">Click to upload an image</p>
+                    <p class="upload-hint">JPG, PNG (Max 2MB)</p>
+                    <input type="file" name="imageFile" accept="image/png,image/jpeg" class="file-input" />
+                </div>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input asp-for="Active" type="checkbox" />
+                    <span class="checkbox-text">
+                        <strong>Active</strong>
+                        <span class="hint">Service is visible to and can be booked by customers.</span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-danger">🗑 Delete Service</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function selectAllStylists() {
+        document.querySelectorAll('input[name="StylistIds"]').forEach(cb => cb.checked = true);
+    }
+</script>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    /* ===== Grid ===== */
+    .edit-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 22px;
+    }
+
+    @@media (max-width: 900px) {
+        .edit-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== Services List ===== */
+    .services-list-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 20px;
+        height: fit-content;
+    }
+
+        .services-list-card h2 {
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .services-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .service-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        background-color: #0d0d0d;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .service-list-item:hover {
+            border-color: #d4af37;
+            text-decoration: none;
+        }
+
+        .service-list-item.active {
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: #d4af37;
+        }
+
+    .service-list-name {
+        color: #ddd;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .service-list-item.active .service-list-name {
+        color: #d4af37;
+    }
+
+    .service-list-edit {
+        color: #888;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .service-list-item:hover .service-list-edit,
+    .service-list-item.active .service-list-edit {
+        opacity: 1;
+    }
+
+    .service-list-item.active .service-list-edit {
+        color: #d4af37;
+    }
+
+    .empty-hint {
+        color: #666;
+        font-size: 13px;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    /* ===== Edit Form ===== */
+    .edit-form-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 30px;
+    }
+
+    .form-title {
+        color: #d4af37;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 22px 0;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    textarea.form-control {
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @@media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== Stylist Chips ===== */
+    .stylist-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .chip-label {
+        cursor: pointer;
+    }
+
+        .chip-label input {
+            display: none;
+        }
+
+    .chip {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 24px;
+        background-color: #0d0d0d;
+        border: 1px solid #444;
+        color: #aaa;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .chip-label input:checked + .chip {
+        background-color: #d4af37;
+        border-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+    .chip-label:hover .chip {
+        border-color: #d4af37;
+        color: #d4af37;
+    }
+
+    .chip-label input:checked:hover + .chip {
+        color: #0d0d0d;
+    }
+
+    .chip-select-all {
+        padding: 8px 18px;
+        border-radius: 24px;
+        background-color: transparent;
+        border: 1px dashed #d4af37;
+        color: #d4af37;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .chip-select-all:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+    /* ===== Upload Box ===== */
+    .upload-box {
+        border: 2px dashed #444;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        background-color: #0d0d0d;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+        .upload-box:hover {
+            border-color: #d4af37;
+        }
+
+    .upload-icon {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .upload-text {
+        color: #ddd;
+        font-size: 14px;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .upload-hint {
+        color: #666;
+        font-size: 12px;
+        margin: 4px 0 0 0;
+    }
+
+    .file-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* ===== Checkbox ===== */
+    .checkbox-group {
+        margin-top: 15px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        cursor: pointer;
+    }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #d4af37;
+            cursor: pointer;
+        }
+
+    .checkbox-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .checkbox-text strong {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .checkbox-text .hint {
+            color: #888;
+            font-size: 12px;
+        }
+
+    /* ===== Form Actions ===== */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            transform: translateY(-1px);
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #d4af37;
+        color: #d4af37;
+    }
+
+        .btn-outline:hover {
+            background-color: #d4af37;
+            color: #0d0d0d;
+        }
+
+    .btn-danger {
+        background-color: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

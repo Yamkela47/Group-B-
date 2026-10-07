@@ -1,0 +1,217 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "_Layout";
+}
+
+<div class="privacy-container">
+    <div class="privacy-card">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: October 2026</p>
+
+        <div class="privacy-content">
+
+            <section>
+                <h2>1. Introduction</h2>
+                <p>
+                    Cutting Edge Salon Management System ("we", "our", "us") is committed to protecting the
+                    privacy of our users. This Privacy Policy explains how we collect, use, and safeguard
+                    information when you use our Manager Portal and related applications.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. Information We Collect</h2>
+                <p>We may collect the following information:</p>
+                <ul>
+                    <li><strong>Account Information:</strong> Full name, email address, phone number, and role.</li>
+                    <li><strong>Booking Information:</strong> Service, stylist, appointment date/time, and payment preference.</li>
+                    <li><strong>Usage Information:</strong> System logs and interaction data used for diagnostics.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>3. How We Use Your Information</h2>
+                <p>Your information is used to:</p>
+                <ul>
+                    <li>Manage salon bookings and stylist schedules.</li>
+                    <li>Send booking confirmations, reminders, and cancellation notifications.</li>
+                    <li>Generate reports and analytics for salon management.</li>
+                    <li>Improve our service and user experience.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>4. Data Security</h2>
+                <p>
+                    We take data security seriously. Passwords are hashed using Supabase Authentication,
+                    and access to records is controlled by Row Level Security (RLS) policies. API keys and
+                    secrets are stored securely and never committed to source control.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. Data Sharing</h2>
+                <p>
+                    We do not sell, trade, or share your personal information with third parties, except as
+                    required to deliver our services (e.g., Supabase for database and authentication, SMTP
+                    service for emails).
+                </p>
+            </section>
+
+            <section>
+                <h2>6. Your Rights</h2>
+                <p>
+                    You have the right to access, update, or delete your personal information. Please contact
+                    the salon manager for any data-related requests.
+                </p>
+            </section>
+
+            <section>
+                <h2>7. Contact Us</h2>
+                <p>
+                    If you have any questions about this Privacy Policy, please contact us:
+                </p>
+                <ul class="contact-list">
+                    <li><strong>Email:</strong> cuttinged@88@gmail.com</li>
+                    <li><strong>Phone:</strong> 078 767 6599</li>
+                    <li><strong>Address:</strong> 10 Melck Street, Pioneer Building, Welkom Central</li>
+                </ul>
+            </section>
+
+        </div>
+
+        <div class="privacy-footer">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .privacy-container {
+        min-height: 100vh;
+        padding: 60px 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .privacy-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 800px;
+        width: 100%;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+
+        .privacy-card h1 {
+            color: #d4af37;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+    .last-updated {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 30px 0;
+        font-style: italic;
+    }
+
+    .privacy-content section {
+        margin-bottom: 28px;
+    }
+
+    .privacy-content h2 {
+        color: #d4af37;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #333;
+    }
+
+    .privacy-content p {
+        color: #bbb;
+        font-size: 14px;
+        line-height: 1.7;
+        margin: 0 0 12px 0;
+    }
+
+    .privacy-content ul {
+        color: #bbb;
+        font-size: 14px;
+        line-height: 1.8;
+        padding-left: 24px;
+        margin: 0 0 12px 0;
+    }
+
+        .privacy-content ul li {
+            margin-bottom: 6px;
+        }
+
+    .privacy-content strong {
+        color: #ddd;
+    }
+
+    .contact-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        .contact-list li {
+            color: #bbb;
+            font-size: 14px;
+            padding: 6px 0;
+        }
+
+        .contact-list strong {
+            color: #d4af37;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+    .privacy-footer {
+        margin-top: 40px;
+        padding-top: 25px;
+        border-top: 1px solid #333;
+        text-align: center;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 26px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    @@media (max-width: 600px) {
+        .privacy-card {
+            padding: 25px 20px;
+        }
+
+            .privacy-card h1 {
+                font-size: 24px;
+            }
+    }
+</style>

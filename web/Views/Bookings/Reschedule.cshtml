@@ -1,0 +1,280 @@
+﻿@model CuttingEdge.ManagerPortal.Models.Booking
+
+@{
+    ViewData["Title"] = "Reschedule Appointment";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <p class="breadcrumb">Bookings > Reschedule</p>
+    <h1>Reschedule Appointment</h1>
+    <p class="subtitle">Update the date and time for this appointment. The customer will be notified.</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="form-container">
+    <form asp-action="Reschedule" asp-route-id="@Model.BookingId" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- Customer Info (read-only) -->
+        <div class="info-grid">
+            <div class="info-card">
+                <label>Customer</label>
+                <span>@Model.Customer?.FullName</span>
+            </div>
+
+            <div class="info-card">
+                <label>Service</label>
+                <span>@Model.Service?.Name</span>
+            </div>
+
+            <div class="info-card">
+                <label>Stylist</label>
+                <span>@Model.Stylist?.Profile?.FullName</span>
+            </div>
+        </div>
+
+        <!-- Current Time (read-only) -->
+        <div class="current-time">
+            <label>Current Appointment</label>
+            <span>@Model.AppointmentDate.ToString("dd MMM yyyy") at @Model.StartTime.ToString(@"hh\:mm")</span>
+        </div>
+
+        <!-- New Time -->
+        <div class="form-section">
+            <h2>New Appointment Time</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date <span class="required">*</span></label>
+                    <input type="date" name="appointmentDate" class="form-control"
+                           value="@Model.AppointmentDate.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Start Time <span class="required">*</span></label>
+                    <input type="time" name="startTime" class="form-control"
+                           value="@Model.StartTime.ToString(@"hh\:mm")" required />
+                </div>
+
+                <div class="form-group">
+                    <label>End Time <span class="required">*</span></label>
+                    <input type="time" name="endTime" class="form-control"
+                           value="@Model.EndTime.ToString(@"hh\:mm")" required />
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <a asp-action="Details" asp-route-id="@Model.BookingId" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save New Time</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    .form-container {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 30px;
+        max-width: 800px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .info-card {
+        background-color: #0d0d0d;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 14px 18px;
+    }
+
+        .info-card label {
+            display: block;
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .info-card span {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+    .current-time {
+        background-color: rgba(212, 175, 55, 0.08);
+        border: 1px solid #d4af37;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 25px;
+    }
+
+        .current-time label {
+            display: block;
+            color: #d4af37;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .current-time span {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+    .form-section {
+        margin-bottom: 25px;
+    }
+
+        .form-section h2 {
+            color: #d4af37;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 18px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+
+    @@media (max-width: 700px) {
+        .form-row, .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+        .form-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 25px;
+    }
+
+    .btn {
+        padding: 12px 26px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            transform: translateY(-1px);
+            color: #0d0d0d;
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

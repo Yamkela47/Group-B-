@@ -1,0 +1,394 @@
+﻿@model CuttingEdge.ManagerPortal.Models.Stylist
+
+@{
+    ViewData["Title"] = "Stylist Details";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <p class="breadcrumb">Stylists > Details</p>
+    <h1>Stylist Details</h1>
+    <p class="subtitle">View the stylist's profile and information.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="details-layout">
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div class="profile-photo-wrapper">
+            @if (!string.IsNullOrEmpty(Model.PhotoUrl))
+            {
+                <img src="@Model.PhotoUrl" alt="@Model.Profile?.FullName" class="profile-photo" />
+            }
+            else
+            {
+                <div class="profile-photo placeholder">
+                    @(Model.Profile?.FullName?.Substring(0, 1)?.ToUpper() ?? "?")
+                </div>
+            }
+        </div>
+
+        <h2 class="profile-name">@Model.Profile?.FullName</h2>
+        <p class="profile-role">@(Model.Profile?.Role ?? "Stylist")</p>
+
+        <span class="status-pill @(Model.Active ? "active" : "inactive")">
+            ● @(Model.Active ? "Active" : "Deactivated")
+        </span>
+
+        <div class="profile-actions">
+            <a asp-action="Edit" asp-route-id="@Model.StylistId" class="btn btn-primary">Edit Profile</a>
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+
+    <!-- Details Panel -->
+    <div class="details-panel">
+
+        <div class="details-section">
+            <h3>Contact Information</h3>
+
+            <div class="detail-row">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value">@Model.Profile?.FullName</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">@Model.Profile?.Email</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">@(Model.Profile?.Phone ?? "—")</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Role</span>
+                <span class="detail-value">@(Model.Profile?.Role ?? "Stylist")</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">
+                    <span class="status-badge @(Model.Active ? "active" : "inactive")">
+                        @(Model.Active ? "Active" : "Inactive")
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h3>Services Offered</h3>
+
+            <div class="services-chips">
+                <span class="service-chip">Standard Haircut</span>
+                <span class="service-chip">Cut &amp; Dye</span>
+                <span class="service-chip">Beard Shave</span>
+                <span class="service-chip">Hot Towel Treatment</span>
+            </div>
+            <p class="hint">All stylists offer the same services.</p>
+        </div>
+
+        <div class="details-section">
+            <h3>Schedule</h3>
+
+            <div class="schedule-grid">
+                <div class="schedule-day">
+                    <span class="day-name">Mon - Fri</span>
+                    <span class="day-hours">09:00 – 17:00</span>
+                </div>
+                <div class="schedule-day">
+                    <span class="day-name">Saturday</span>
+                    <span class="day-hours">09:00 – 15:00</span>
+                </div>
+                <div class="schedule-day">
+                    <span class="day-name">Sunday</span>
+                    <span class="day-hours off">Off</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    /* ===== Layout ===== */
+    .details-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+    }
+
+    @@media (max-width: 900px) {
+        .details-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== Profile Card ===== */
+    .profile-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 30px 20px;
+        text-align: center;
+        height: fit-content;
+    }
+
+    .profile-photo {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #d4af37;
+        margin: 0 auto 18px;
+        display: block;
+    }
+
+        .profile-photo.placeholder {
+            background-color: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4af37;
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+    .profile-name {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+    }
+
+    .profile-role {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 16px 0;
+        text-transform: capitalize;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+        .status-pill.active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .status-pill.inactive {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #888;
+            border: 1px solid #555;
+        }
+
+    .profile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* ===== Details Panel ===== */
+    .details-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .details-section {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 25px;
+    }
+
+        .details-section h3 {
+            color: #d4af37;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 18px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #222;
+        font-size: 14px;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        color: #888;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #ddd;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    /* ===== Service Chips ===== */
+    .services-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .service-chip {
+        background-color: rgba(212, 175, 55, 0.1);
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hint {
+        color: #666;
+        font-size: 12px;
+        font-style: italic;
+        margin: 0;
+    }
+
+    /* ===== Schedule Grid ===== */
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .schedule-day {
+        background-color: #0d0d0d;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .day-name {
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .day-hours {
+        color: #d4af37;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .day-hours.off {
+            color: #666;
+        }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

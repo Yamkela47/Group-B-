@@ -1,0 +1,467 @@
+﻿@model CuttingEdge.ManagerPortal.ViewModels.ServicesPromotionsViewModel
+
+@{
+    ViewData["Title"] = "Services & Promotions";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Services & Promotions</h1>
+        <p class="subtitle">Manage all salon services and active promotions.</p>
+    </div>
+    <div class="header-actions">
+        <a asp-action="Create" class="btn btn-primary">+ New Service</a>
+        <a asp-controller="Promotions" asp-action="Create" class="btn btn-outline">+ New Promotion</a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- ===== Services Section ===== -->
+<div class="section">
+    <div class="section-header">
+        <h2>Services</h2>
+        <span class="count-badge">@(Model.Services?.Count ?? 0) services</span>
+    </div>
+
+    @if (Model.Services != null && Model.Services.Any())
+    {
+        <div class="services-grid">
+            @foreach (var service in Model.Services)
+            {
+                <div class="service-card @(service.Active ? "" : "inactive")">
+                    <div class="service-header">
+                        <h3>@service.Name</h3>
+                        @if (service.IsFlagship)
+                        {
+                            <span class="flagship-badge">★ Flagship</span>
+                        }
+                </div>
+
+                <p class="service-description">
+                    @(service.Description?.Length > 80
+                                    ? service.Description.Substring(0, 80) + "..."
+                                    : service.Description)
+            </p>
+
+                    <div class="service-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Price</span>
+                            <span class="meta-value highlight">R @service.Price.ToString("N2")</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">@service.DurationMinutes min</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Status</span>
+                            <span class="status-badge @(service.Active ? "active" : "inactive")">
+                                @(service.Active ? "Active" : "Inactive")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="service-actions">
+                        <a asp-action="Edit" asp-route-id="@service.ServiceId" class="btn btn-outline btn-sm">Edit</a>
+                        <form asp-action="Delete" asp-route-id="@service.ServiceId" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Delete this service? This cannot be undone.');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No services found. Click "+ New Service" to add one.</p>
+        </div>
+    }
+</div>
+
+<!-- ===== Active Promotions Section ===== -->
+<div class="section">
+    <div class="section-header">
+        <h2>Active Promotions</h2>
+        <a asp-controller="Promotions" asp-action="Index" class="link-view-all">Manage Promotions →</a>
+    </div>
+
+    @if (Model.Promotions != null && Model.Promotions.Any())
+    {
+        <div class="promotions-list">
+            @foreach (var promotion in Model.Promotions)
+            {
+                <div class="promotion-item">
+                    <div class="promotion-info">
+                        <div class="promotion-title">@promotion.Title</div>
+                        <div class="promotion-sub">
+                            <span>@promotion.Service?.Name</span>
+                            <span class="dot-sep">•</span>
+                            <span>@promotion.StartDate.ToString("dd MMM") - @promotion.EndDate.ToString("dd MMM yyyy")</span>
+                        </div>
+                    </div>
+                    <div class="promotion-value">
+                        @if (promotion.DiscountType == "Percentage")
+                        {
+                            <span>-@promotion.DiscountValue%</span>
+                        }
+                        else
+                        {
+                            <span>-R @promotion.DiscountValue</span>
+                        }
+                    </div>
+                    <a asp-controller="Promotions" asp-action="Edit" asp-route-id="@promotion.PromotionId" class="btn btn-outline btn-sm">Edit</a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No active promotions.</p>
+        </div>
+    }
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+        .page-header h1 {
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .page-header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* ===== Sections ===== */
+    .section {
+        margin-bottom: 35px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+        .section-header h2 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .count-badge {
+        color: #888;
+        font-size: 12px;
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .link-view-all {
+        color: #d4af37;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .link-view-all:hover {
+            text-decoration: underline;
+        }
+
+    /* ===== Services Grid ===== */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .service-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 22px;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .service-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .service-card.inactive {
+            opacity: 0.6;
+        }
+
+    .service-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .service-header h3 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.3;
+            flex: 1;
+        }
+
+    .flagship-badge {
+        background-color: rgba(212, 175, 55, 0.15);
+        color: #d4af37;
+        border: 1px solid #d4af37;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .service-description {
+        color: #999;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 0 0 16px 0;
+        flex: 1;
+    }
+
+    .service-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background-color: #0d0d0d;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+    }
+
+    .meta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+    }
+
+    .meta-label {
+        color: #777;
+    }
+
+    .meta-value {
+        color: #ddd;
+        font-weight: 600;
+    }
+
+        .meta-value.highlight {
+            color: #d4af37;
+        }
+
+    .status-badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+        .status-badge.active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #888;
+            border: 1px solid #555;
+        }
+
+    .service-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    /* ===== Promotions List ===== */
+    .promotions-list {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .promotion-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 16px 22px;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+        .promotion-item:last-child {
+            border-bottom: none;
+        }
+
+    .promotion-info {
+        flex: 1;
+    }
+
+    .promotion-title {
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .promotion-sub {
+        color: #888;
+        font-size: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .dot-sep {
+        color: #555;
+    }
+
+    .promotion-value {
+        color: #d4af37;
+        font-size: 16px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        flex: 1;
+    }
+
+        .btn-outline:hover {
+            background-color: #d4af37;
+            color: #0d0d0d;
+        }
+
+    .btn-danger {
+        background-color: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        flex: 1;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .btn-sm {
+        padding: 7px 14px;
+        font-size: 12px;
+    }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+        background-color: #1a1a1a;
+        border: 1px dashed #444;
+        border-radius: 12px;
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+        .empty-state p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>
