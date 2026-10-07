@@ -12,9 +12,18 @@
         <p class="hero-description">
             Manage bookings, stylists, services, schedules and reports — all in one powerful system.
         </p>
-        <a asp-controller="Account" asp-action="Login" class="btn-hero">
-            Login as Manager / Staff
-        </a>
+        @if (User?.Identity?.IsAuthenticated == true || !string.IsNullOrEmpty(Context.Session.GetString("UserEmail")))
+        {
+            <a asp-controller="Dashboard" asp-action="Index" class="btn-hero">
+                Continue to Dashboard
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login" class="btn-hero">
+                Login as Manager / Staff
+            </a>
+        }
     </div>
 </section>
 
