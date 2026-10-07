@@ -1,0 +1,126 @@
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\appsettings.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.staticwebassets.runtime.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.staticwebassets.endpoints.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.exe
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.deps.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.runtimeconfig.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Cutting Edge Management System.pdb
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\BirdMessenger.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.Extensions.WebEncoders.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\MimeMapping.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Core.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\System.Reactive.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\System.Security.Cryptography.Xml.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\Websocket.Client.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.csproj.AssemblyReference.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.AssemblyInfoInputs.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.AssemblyInfo.cs
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.csproj.CoreCompileInputs.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.RazorAssemblyInfo.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.RazorAssemblyInfo.cs
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\scopedcss\bundle\Cutting Edge Management System.styles.css
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\scopedcss\projectbundle\Cutting Edge Management System.bundle.scp.css
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting .52CE14E8.Up2Date
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\refint\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.pdb
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\Cutting Edge Management System.genruntimeconfig.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting_Edge_Management_System_v2\obj\Debug\net8.0\ref\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\appsettings.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.staticwebassets.endpoints.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.staticwebassets.runtime.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.exe
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.deps.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.runtimeconfig.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Cutting Edge Management System.pdb
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\BirdMessenger.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.Extensions.WebEncoders.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\MimeMapping.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Core.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\System.Reactive.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\System.Security.Cryptography.Xml.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\Websocket.Client.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.csproj.AssemblyReference.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.AssemblyInfoInputs.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.AssemblyInfo.cs
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.csproj.CoreCompileInputs.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.RazorAssemblyInfo.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.RazorAssemblyInfo.cs
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\scopedcss\bundle\Cutting Edge Management System.styles.css
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\scopedcss\projectbundle\Cutting Edge Management System.bundle.scp.css
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting .52CE14E8.Up2Date
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\refint\Cutting Edge Management System.dll
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.pdb
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\Cutting Edge Management System.genruntimeconfig.cache
+C:\Users\THABANG ZITHA\Downloads\Cutting Edge Management System\obj\Debug\net8.0\ref\Cutting Edge Management System.dll
