@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CuttingEdge.ManagerPortal</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.13" />
+    <PackageReference Include="Supabase" Version="8.3.0" />
+  </ItemGroup>
+
+  <!--
+    The Supabase package is removed for now so the app runs on sample data.
+    When you are ready to connect Supabase, add it back:
+        dotnet add package Supabase
+  -->
+
+</Project>
