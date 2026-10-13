@@ -1,6 +1,5 @@
-﻿using CuttingEdge.ManagerPortal.Services;
+using CuttingEdge.ManagerPortal.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,26 +36,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-// Supabase Client
-builder.Services.AddScoped<Supabase.Client>(_ =>
-{
-    var url = builder.Configuration["Supabase:Url"];
-    var key = builder.Configuration["Supabase:AnonKey"];
-
-    if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(key))
-        throw new InvalidOperationException(
-            "Supabase Url and AnonKey must be configured in appsettings.json");
-
-    var options = new SupabaseOptions
-    {
-        AutoRefreshToken = true,
-        AutoConnectRealtime = false
-    };
-
-    return new Supabase.Client(url, key, options);
-});
-
-// Application Services
+// Supabase (REST: tables, auth, storage). Settings: Supabase:Url, AnonKey, ServiceRoleKey.
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<SupabaseService>();
 
 var app = builder.Build();

@@ -5,17 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CuttingEdge.ManagerPortal</RootNamespace>
+    <UserSecretsId>ff6dc1b9-ddc4-4cd7-afb2-cdef318eaa68</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.13" />
-    <PackageReference Include="Supabase" Version="8.3.0" />
   </ItemGroup>
 
-  <!--
-    The Supabase package is removed for now so the app runs on sample data.
-    When you are ready to connect Supabase, add it back:
-        dotnet add package Supabase
-  -->
+  <!-- Supabase is called over its REST API with HttpClient (see Services/SupabaseService.cs), so no Supabase NuGet package is needed. -->
 
 </Project>
