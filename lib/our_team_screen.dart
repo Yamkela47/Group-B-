@@ -149,7 +149,7 @@ class _TeamMemberCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.surface,
                         border: Border.all(
-                          color: AppColors.gold.withOpacity(0.5),
+                          color: AppColors.gold.withValues(alpha: 0.5),
                           width: 1.2,
                         ),
                       ),

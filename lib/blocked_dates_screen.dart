@@ -82,12 +82,12 @@ class _MiniCalendar extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 color: blocked
-                    ? AppColors.gold.withOpacity(0.18)
-                    : (isToday ? AppColors.gold.withOpacity(0.08) : Colors.transparent),
+                    ? AppColors.gold.withValues(alpha: 0.18)
+                    : (isToday ? AppColors.gold.withValues(alpha: 0.08) : Colors.transparent),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: blocked
-                      ? AppColors.gold.withOpacity(0.6)
+                      ? AppColors.gold.withValues(alpha: 0.6)
                       : (isToday ? AppColors.gold : AppColors.border),
                 ),
               ),

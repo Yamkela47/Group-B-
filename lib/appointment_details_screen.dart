@@ -25,8 +25,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
                     height: 66,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.gold.withOpacity(0.12),
-                      border: Border.all(color: AppColors.gold.withOpacity(0.5)),
+                      color: AppColors.gold.withValues(alpha: 0.12),
+                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
                     ),
                     child: const Icon(Icons.person, color: AppColors.gold, size: 30),
                   ),

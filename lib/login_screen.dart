@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_theme.dart';
 import 'brand.dart';
 import 'buttons.dart';
-import 'inputs.dart';
 import 'customer_home_screen.dart';
 import 'stylist_home_screen.dart';
 import 'forgot_password_screen.dart';

@@ -21,7 +21,7 @@ class EditProfileScreen extends StatelessWidget {
                 width: 82, height: 82,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.gold.withOpacity(0.12),
+                  color: AppColors.gold.withValues(alpha: 0.12),
                   border: Border.all(color: AppColors.gold, width: 1.5),
                 ),
                 child: const Icon(Icons.person, color: AppColors.gold, size: 40),

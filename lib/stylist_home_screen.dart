@@ -42,10 +42,10 @@ class _StylistHomeScreenState extends State<StylistHomeScreen> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.gold.withOpacity(0.35)),
+                border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft, end: Alignment.bottomRight,
-                  colors: [AppColors.gold.withOpacity(0.12), AppColors.surfaceAlt],
+                  colors: [AppColors.gold.withValues(alpha: 0.12), AppColors.surfaceAlt],
                 ),
               ),
               child: Row(
@@ -72,8 +72,8 @@ class _StylistHomeScreenState extends State<StylistHomeScreen> {
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.gold.withOpacity(0.12),
-                      border: Border.all(color: AppColors.gold.withOpacity(0.4)),
+                      color: AppColors.gold.withValues(alpha: 0.12),
+                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
                     ),
                     child: const Icon(Icons.event_available, color: AppColors.gold, size: 28),
                   ),
@@ -140,9 +140,9 @@ class _ActionRow extends StatelessWidget {
           Container(
             width: 42, height: 42,
             decoration: BoxDecoration(
-              color: AppColors.gold.withOpacity(0.1),
+              color: AppColors.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
             ),
             child: Icon(icon, color: AppColors.gold, size: 20),
           ),

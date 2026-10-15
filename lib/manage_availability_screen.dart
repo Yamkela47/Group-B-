@@ -37,8 +37,8 @@ class _ManageAvailabilityScreenState extends State<ManageAvailabilityScreen> {
                       const Spacer(),
                       Switch(
                         value: _days[d]!,
-                        activeColor: AppColors.gold,
-                        activeTrackColor: AppColors.gold.withOpacity(0.35),
+                        activeThumbColor: AppColors.gold,
+                        activeTrackColor: AppColors.gold.withValues(alpha: 0.35),
                         onChanged: (v) => setState(() => _days[d] = v),
                       ),
                     ],

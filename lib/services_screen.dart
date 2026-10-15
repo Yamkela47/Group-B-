@@ -206,7 +206,7 @@ class _ServiceCard extends StatelessWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AppColors.gold.withOpacity(0.4),
+                    color: AppColors.gold.withValues(alpha: 0.4),
                     width: 1,
                   ),
                 ),

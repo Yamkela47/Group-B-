@@ -148,8 +148,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               onPrimary: Colors.black,
               surface: AppColors.surfaceAlt,
               onSurface: Colors.white,
-            ),
-            dialogBackgroundColor: AppColors.surface,
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surface),
           ),
           child: child!,
         );
@@ -314,7 +313,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               const Spacer(),
               Text('View All',
                   style: TextStyle(
-                      color: AppColors.gold.withOpacity(0.9),
+                      color: AppColors.gold.withValues(alpha: 0.9),
                       fontSize: 12,
                       fontWeight: FontWeight.w700)),
             ],
@@ -357,7 +356,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 onTap: _pickDate,
                 child: Text('View Calendar',
                     style: TextStyle(
-                        color: AppColors.gold.withOpacity(0.9),
+                        color: AppColors.gold.withValues(alpha: 0.9),
                         fontSize: 12,
                         fontWeight: FontWeight.w700)),
               ),
@@ -441,7 +440,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 child: Text(
                   'Greyed out slots are already booked.',
                   style: TextStyle(
-                    color: AppColors.textMuted.withOpacity(0.9),
+                    color: AppColors.textMuted.withValues(alpha: 0.9),
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
                   ),
@@ -539,7 +538,7 @@ class _HeroServiceCard extends StatelessWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color: AppColors.gold.withOpacity(0.4)),
+                      color: AppColors.gold.withValues(alpha: 0.4)),
                 ),
                 child: const Icon(Icons.content_cut,
                     color: AppColors.gold, size: 34),
@@ -708,7 +707,7 @@ class _DateChip extends StatelessWidget {
             Text(month,
                 style: TextStyle(
                     color: selected
-                        ? Colors.black.withOpacity(0.75)
+                        ? Colors.black.withValues(alpha: 0.75)
                         : AppColors.textMuted,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w600)),
@@ -840,7 +839,7 @@ class _ChipWrap extends StatelessWidget {
               boxShadow: isSelected && !isTaken
                   ? [
                       BoxShadow(
-                        color: AppColors.gold.withOpacity(0.35),
+                        color: AppColors.gold.withValues(alpha: 0.35),
                         blurRadius: 8,
                         spreadRadius: 1,
                       )

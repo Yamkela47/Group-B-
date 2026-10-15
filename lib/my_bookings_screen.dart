@@ -486,7 +486,7 @@ class _BookingCard extends StatelessWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color: AppColors.gold.withOpacity(0.4)),
+                      color: AppColors.gold.withValues(alpha: 0.4)),
                 ),
                 child: const Icon(Icons.content_cut,
                     color: AppColors.gold, size: 28),
@@ -516,10 +516,10 @@ class _BookingCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
+                        color: statusColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                         border:
-                            Border.all(color: statusColor.withOpacity(0.4)),
+                            Border.all(color: statusColor.withValues(alpha: 0.4)),
                       ),
                       child: Text(
                         status.toUpperCase(),
@@ -641,7 +641,7 @@ class _ActionPill extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: onTap == null
-                ? color.withOpacity(0.15)
+                ? color.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: color, width: 1),

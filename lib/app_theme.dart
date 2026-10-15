@@ -19,8 +19,8 @@ class AppTheme {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.black,
         primaryColor: AppColors.gold,
-        splashColor: AppColors.gold.withOpacity(0.08),
-        highlightColor: AppColors.gold.withOpacity(0.04),
+        splashColor: AppColors.gold.withValues(alpha: 0.08),
+        highlightColor: AppColors.gold.withValues(alpha: 0.04),
         colorScheme: const ColorScheme.dark(
           primary: AppColors.gold,
           secondary: AppColors.gold,

@@ -16,7 +16,7 @@ class GradientThumb extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.gold.withOpacity(0.18), Colors.black],
+          colors: [AppColors.gold.withValues(alpha: 0.18), Colors.black],
         ),
       ),
       child: Icon(icon, color: AppColors.gold, size: size * 0.42),

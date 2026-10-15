@@ -70,10 +70,10 @@ class DailyScheduleScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 14),
                         color: slot.$3
-                            ? AppColors.gold.withOpacity(0.08)
+                            ? AppColors.gold.withValues(alpha: 0.08)
                             : AppColors.surfaceAlt,
                         borderColor: slot.$3
-                            ? AppColors.gold.withOpacity(0.35)
+                            ? AppColors.gold.withValues(alpha: 0.35)
                             : AppColors.border,
                         child: Text(
                           slot.$2,

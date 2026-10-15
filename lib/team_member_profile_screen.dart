@@ -49,7 +49,7 @@ class _TeamMemberProfileScreenState extends State<TeamMemberProfileScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surfaceAlt,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.gold.withOpacity(0.5)),
+                border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
               ),
               child: Column(
                 children: [
@@ -67,7 +67,7 @@ class _TeamMemberProfileScreenState extends State<TeamMemberProfileScreen> {
                           shape: BoxShape.circle,
                           color: AppColors.surface,
                           border: Border.all(
-                            color: AppColors.gold.withOpacity(0.6),
+                            color: AppColors.gold.withValues(alpha: 0.6),
                             width: 1.5,
                           ),
                         ),
@@ -286,7 +286,7 @@ class _ServiceChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceAlt,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.gold.withOpacity(0.5)),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
       ),
       child: Text(
         label,

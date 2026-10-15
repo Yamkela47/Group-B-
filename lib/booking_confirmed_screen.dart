@@ -151,7 +151,7 @@ class BookingConfirmedScreen extends StatelessWidget {
                                   color: AppColors.surface,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: AppColors.gold.withOpacity(0.5),
+                                    color: AppColors.gold.withValues(alpha: 0.5),
                                     width: 1.2,
                                   ),
                                 ),
@@ -409,7 +409,7 @@ class _RowDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 1,
-      color: AppColors.gold.withOpacity(0.25),
+      color: AppColors.gold.withValues(alpha: 0.25),
     );
   }
 }

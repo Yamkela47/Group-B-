@@ -195,7 +195,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.gold.withOpacity(0.4)),
+                            color: AppColors.gold.withValues(alpha: 0.4)),
                       ),
                       child: const Icon(Icons.content_cut,
                           color: AppColors.gold, size: 26),
@@ -294,7 +294,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   'No online payment is processed. Your chosen method will be '
                   'used when you pay at the salon.',
                   style: TextStyle(
-                    color: AppColors.textMuted.withOpacity(0.9),
+                    color: AppColors.textMuted.withValues(alpha: 0.9),
                     fontSize: 11.5,
                     height: 1.4,
                   ),

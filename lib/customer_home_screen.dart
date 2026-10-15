@@ -166,7 +166,7 @@ class _ImagePlaceholder extends StatelessWidget {
         shape: circular ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: circular ? null : BorderRadius.circular(10),
         border: Border.all(
-          color: AppColors.gold.withOpacity(0.5),
+          color: AppColors.gold.withValues(alpha: 0.5),
           width: 1.2,
         ),
       ),
@@ -504,7 +504,7 @@ class _PromoSlideCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: AppColors.surface,
                       border: Border.all(
-                        color: AppColors.gold.withOpacity(0.5),
+                        color: AppColors.gold.withValues(alpha: 0.5),
                         width: 1.2,
                       ),
                     ),
