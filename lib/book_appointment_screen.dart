@@ -49,7 +49,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   // ---------- Time ----------
   String? _selectedTime;
 
-  // ---------- Taken slots ----------
+  // ---------- Taken slots (double-booking prevention) ----------
   Set<String> _takenSlots = {};
   bool _loadingSlots = false;
 
@@ -62,12 +62,18 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     imagePath: 'assets/images/standard_haircut.jpg',
   );
 
+  // =================================================================
+  //  LIFECYCLE
+  // =================================================================
   @override
   void initState() {
     super.initState();
     _refreshTakenSlots();
   }
 
+  // =================================================================
+  //  FETCH TAKEN SLOTS FROM SUPABASE
+  // =================================================================
   Future<void> _refreshTakenSlots() async {
     if (!mounted) return;
     setState(() => _loadingSlots = true);
@@ -99,6 +105,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       if (mounted) setState(() => _loadingSlots = false);
     }
   }
+
+  // =================================================================
+  //  HELPERS
+  // =================================================================
 
   String _weekdayShort(DateTime d) {
     const w = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -148,7 +158,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               onPrimary: Colors.black,
               surface: AppColors.surfaceAlt,
               onSurface: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surface),
+            ),
+            dialogBackgroundColor: AppColors.surface,
           ),
           child: child!,
         );
@@ -209,6 +220,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           servicePrice: _service.price,
           serviceImagePath: _service.imagePath,
           stylist: _selectedStylist.name,
+          stylistId: _selectedStylist.id, // <--- THIS WAS ADDED
           date: _selectedDate,
           time: _selectedTime!,
         ),
@@ -217,6 +229,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       _refreshTakenSlots();
     });
   }
+
+  // =================================================================
+  //  BUILD
+  // =================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -289,6 +305,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
         children: [
+          /* ---------- SERVICE TITLE ---------- */
           Text(_service.name,
               style: const TextStyle(
                   color: AppColors.gold,
@@ -300,9 +317,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                   color: AppColors.textSecondary, fontSize: 13)),
           const SizedBox(height: 16),
 
+          /* ---------- HERO CARD ---------- */
           _HeroServiceCard(service: _service),
           const SizedBox(height: 22),
 
+          /* ---------- STYLIST ---------- */
           Row(
             children: [
               const Text('Select a Stylist',
@@ -313,7 +332,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               const Spacer(),
               Text('View All',
                   style: TextStyle(
-                      color: AppColors.gold.withValues(alpha: 0.9),
+                      color: AppColors.gold.withOpacity(0.9),
                       fontSize: 12,
                       fontWeight: FontWeight.w700)),
             ],
@@ -344,6 +363,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 22),
 
+          /* ---------- DATE ---------- */
           Row(
             children: [
               const Text('Select a Date',
@@ -356,7 +376,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 onTap: _pickDate,
                 child: Text('View Calendar',
                     style: TextStyle(
-                        color: AppColors.gold.withValues(alpha: 0.9),
+                        color: AppColors.gold.withOpacity(0.9),
                         fontSize: 12,
                         fontWeight: FontWeight.w700)),
               ),
@@ -401,6 +421,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 22),
 
+          /* ---------- TIME ---------- */
           Row(
             children: [
               const Text('Select Time',
@@ -440,7 +461,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 child: Text(
                   'Greyed out slots are already booked.',
                   style: TextStyle(
-                    color: AppColors.textMuted.withValues(alpha: 0.9),
+                    color: AppColors.textMuted.withOpacity(0.9),
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
                   ),
@@ -538,7 +559,7 @@ class _HeroServiceCard extends StatelessWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                      color: AppColors.gold.withValues(alpha: 0.4)),
+                      color: AppColors.gold.withOpacity(0.4)),
                 ),
                 child: const Icon(Icons.content_cut,
                     color: AppColors.gold, size: 34),
@@ -707,7 +728,7 @@ class _DateChip extends StatelessWidget {
             Text(month,
                 style: TextStyle(
                     color: selected
-                        ? Colors.black.withValues(alpha: 0.75)
+                        ? Colors.black.withOpacity(0.75)
                         : AppColors.textMuted,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w600)),
@@ -839,7 +860,7 @@ class _ChipWrap extends StatelessWidget {
               boxShadow: isSelected && !isTaken
                   ? [
                       BoxShadow(
-                        color: AppColors.gold.withValues(alpha: 0.35),
+                        color: AppColors.gold.withOpacity(0.35),
                         blurRadius: 8,
                         spreadRadius: 1,
                       )
@@ -882,7 +903,7 @@ class _ChipWrap extends StatelessWidget {
    DATA MODELS
    =================================================================== */
 class _Stylist {
-  final int id; // <--- THIS WAS MISSING!
+  final int id;
   final String name;
   final double rating;
   const _Stylist({

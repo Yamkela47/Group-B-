@@ -8,6 +8,7 @@ class PaymentMethodScreen extends StatefulWidget {
   final String servicePrice;
   final String serviceImagePath;
   final String stylist;
+  final int stylistId; // <--- ADDED THIS
   final DateTime date;
   final String time;
 
@@ -17,6 +18,7 @@ class PaymentMethodScreen extends StatefulWidget {
     required this.servicePrice,
     required this.serviceImagePath,
     required this.stylist,
+    required this.stylistId, // <--- ADDED THIS
     required this.date,
     required this.time,
   });
@@ -64,9 +66,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         'start_time': widget.time,
         'status': 'confirmed',
         'payment_method_id': paymentMethodId,
-        // Note: If your bookings table doesn't have these columns, remove them:
-        // 'service_name': widget.service,
-        // 'stylist_name': widget.stylist,
+        'stylist_id': widget.stylistId, // <--- ADDED THIS
+        // IMPORTANT: If your bookings table requires a service_id, 
+        // uncomment the line below and put a valid ID from your services table.
+        // 'service_id': 1, 
       });
 
       if (!mounted) return;
