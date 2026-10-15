@@ -1,0 +1,647 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+    Layout = "_Layout";
+
+    var period = ViewBag.Period as string ?? "monthly";
+    var fromDate = ViewBag.FromDate as DateTime?;
+    var toDate = ViewBag.ToDate as DateTime?;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Reports</h1>
+        <p class="subtitle">Revenue & Booking Reports</p>
+    </div>
+    <a asp-action="Download"
+       asp-route-period="@period"
+       asp-route-from="@fromDate?.ToString("yyyy-MM-dd")"
+       asp-route-to="@toDate?.ToString("yyyy-MM-dd")"
+       class="btn btn-primary">
+        Download Report
+    </a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a asp-action="Index" asp-route-period="weekly"
+       class="tab @(period == "weekly" ? "active" : "")">Weekly</a>
+    <a asp-action="Index" asp-route-period="monthly"
+       class="tab @(period == "monthly" ? "active" : "")">Monthly</a>
+    <a asp-action="Index" asp-route-period="custom"
+       class="tab @(period == "custom" ? "active" : "")">Custom</a>
+</div>
+
+<!-- Custom Date Range -->
+@if (period == "custom")
+{
+    <form method="get" asp-action="Index" class="custom-range-form">
+        <input type="hidden" name="period" value="custom" />
+        <div class="range-group">
+            <label>From</label>
+            <input type="date" name="from" class="form-control" value="@fromDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="range-group">
+            <label>To</label>
+            <input type="date" name="to" class="form-control" value="@toDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="btn btn-primary">Apply</button>
+    </form>
+}
+
+<!-- Summary Cards -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Completed Bookings</div>
+        <div class="metric-value">@(ViewBag.CompletedBookings ?? 512)</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Cancelled</div>
+        <div class="metric-value text-danger">@(ViewBag.Cancelled ?? 34)</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Cash Revenue</div>
+        <div class="metric-value">R @(((decimal)(ViewBag.CashRevenue ?? 49800m)).ToString("N2"))</div>
+        <div class="metric-subtext">@(ViewBag.CashPercent ?? 62)% of total revenue</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Card Revenue</div>
+        <div class="metric-value">R @(((decimal)(ViewBag.CardRevenue ?? 31200m)).ToString("N2"))</div>
+        <div class="metric-subtext">@(ViewBag.CardPercent ?? 38)% of total revenue</div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="charts-row">
+
+    <!-- Revenue by Week -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h2>Revenue by Week — Cash vs Card</h2>
+            <div class="legend">
+                <span class="legend-item"><span class="dot cash"></span> Cash</span>
+                <span class="legend-item"><span class="dot card"></span> Card</span>
+            </div>
+        </div>
+
+        <div class="bar-chart">
+            @{
+                var weeks = new[]
+                {
+                        new { Label = "Week 1", Cash = 12450m, Card = 7630m },
+                        new { Label = "Week 2", Cash = 14200m, Card = 8800m },
+                        new { Label = "Week 3", Cash = 13800m, Card = 9400m },
+                        new { Label = "Week 4", Cash = 9350m, Card = 5370m }
+                        };
+                var maxValue = weeks.Max(w => Math.Max(w.Cash, w.Card));
+            }
+
+            @foreach (var week in weeks)
+            {
+                <div class="bar-group">
+                    <div class="bars">
+                        <div class="bar cash-bar" style="height: @((week.Cash / maxValue * 100).ToString("0"))%">
+                            <span class="bar-tooltip">R @week.Cash.ToString("N0")</span>
+                        </div>
+                        <div class="bar card-bar" style="height: @((week.Card / maxValue * 100).ToString("0"))%">
+                            <span class="bar-tooltip">R @week.Card.ToString("N0")</span>
+                        </div>
+                    </div>
+                    <span class="bar-label">@week.Label</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Service Demand -->
+    <div class="chart-card">
+        <h2>Service Demand</h2>
+
+        <div class="service-demand-list">
+            @{
+                var services = new[]
+                {
+                        new { Name = "Cut & Dye", Percent = 92 },
+                        new { Name = "Haircut", Percent = 78 },
+                        new { Name = "Beard Shave", Percent = 55 },
+                        new { Name = "Hot Towel", Percent = 34 }
+                        };
+            }
+
+            @foreach (var svc in services)
+            {
+                <div class="demand-item">
+                    <div class="demand-header">
+                        <span class="demand-name">@svc.Name</span>
+                    </div>
+                    <div class="demand-bar-track">
+                        <div class="demand-bar" style="width: @(svc.Percent)%"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<!-- Payment Method Breakdown -->
+<div class="breakdown-card">
+    <h2>Payment Method Breakdown</h2>
+    <p class="breakdown-subtitle">
+        @if (period == "monthly")
+        {
+            <text>Month of @DateTime.UtcNow.ToString("MMMM yyyy")</text>
+        }
+        else if (period == "weekly")
+        {
+            <text>Week of @DateTime.UtcNow.AddDays(-7).ToString("dd MMM") - @DateTime.UtcNow.ToString("dd MMM yyyy")</text>
+        }
+        else if (fromDate.HasValue && toDate.HasValue)
+        {
+            <text>@fromDate.Value.ToString("dd MMM yyyy") - @toDate.Value.ToString("dd MMM yyyy")</text>
+        }
+    </p>
+
+    <div class="breakdown-bar">
+        <div class="bar-segment cash" style="width: 62%;">
+            <span>62%</span>
+        </div>
+        <div class="bar-segment card" style="width: 38%;">
+            <span>38%</span>
+        </div>
+    </div>
+
+    <div class="breakdown-legend">
+        <div class="legend-row">
+            <span class="legend-label">
+                <span class="dot cash"></span> Cash — R @(((decimal)(ViewBag.CashRevenue ?? 49800m)).ToString("N2"))
+            </span>
+            <span class="legend-label">
+                <span class="dot card"></span> Card — R @(((decimal)(ViewBag.CardRevenue ?? 31200m)).ToString("N2"))
+            </span>
+        </div>
+        <div class="legend-total">
+            <strong>Total: R @(((decimal)(ViewBag.TotalRevenue ?? 81000m)).ToString("N2"))</strong>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+        .page-header h1 {
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .page-header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+    /* ===== Filter Tabs ===== */
+    .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        padding: 10px 24px;
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #aaa;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+        .tab:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .tab.active {
+            background-color: #d4af37;
+            color: #0d0d0d;
+            border-color: #d4af37;
+        }
+
+    /* ===== Custom Range ===== */
+    .custom-range-form {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .range-group {
+        flex: 1;
+        min-width: 180px;
+    }
+
+        .range-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    /* ===== Metrics Cards ===== */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .metric-card {
+        background-color: #1a1a1a;
+        border: 1px solid #d4af37;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+        .metric-card:hover {
+            border-color: #f0d060;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.12);
+        }
+
+    .metric-label {
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 6px;
+    }
+
+        .metric-value.text-danger {
+            color: #dc3545;
+        }
+
+    .metric-subtext {
+        color: #666;
+        font-size: 11px;
+    }
+
+    /* ===== Charts Row ===== */
+    .charts-row {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    @@media (max-width: 1000px) {
+        .charts-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .chart-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 25px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .chart-card h2 {
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+    }
+
+    .chart-header h2 {
+        margin: 0;
+    }
+
+    .legend {
+        display: flex;
+        gap: 15px;
+    }
+
+    .legend-item {
+        color: #aaa;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+        .dot.cash {
+            background-color: #d4af37;
+        }
+
+        .dot.card {
+            background-color: #7a5e1a;
+        }
+
+    /* ===== Bar Chart ===== */
+    .bar-chart {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        height: 220px;
+        padding: 0 10px;
+        gap: 20px;
+    }
+
+    .bar-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        height: 100%;
+        justify-content: flex-end;
+    }
+
+    .bars {
+        display: flex;
+        gap: 6px;
+        align-items: flex-end;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .bar {
+        width: 26px;
+        border-radius: 4px 4px 0 0;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        min-height: 4px;
+    }
+
+        .bar:hover {
+            filter: brightness(1.2);
+        }
+
+        .bar.cash-bar {
+            background-color: #d4af37;
+        }
+
+        .bar.card-bar {
+            background-color: #7a5e1a;
+        }
+
+    .bar-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #0d0d0d;
+        color: #d4af37;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        margin-bottom: 4px;
+        border: 1px solid #d4af37;
+    }
+
+    .bar:hover .bar-tooltip {
+        opacity: 1;
+    }
+
+    .bar-label {
+        color: #888;
+        font-size: 12px;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+
+    /* ===== Service Demand ===== */
+    .service-demand-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .demand-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .demand-header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .demand-name {
+        color: #ddd;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .demand-bar-track {
+        background-color: #0d0d0d;
+        border-radius: 6px;
+        height: 12px;
+        overflow: hidden;
+    }
+
+    .demand-bar {
+        background: linear-gradient(90deg, #d4af37, #f0d060);
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.6s ease;
+    }
+
+    /* ===== Payment Breakdown ===== */
+    .breakdown-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 25px;
+    }
+
+        .breakdown-card h2 {
+            color: #d4af37;
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+
+    .breakdown-subtitle {
+        color: #888;
+        font-size: 12px;
+        margin: 0 0 20px 0;
+    }
+
+    .breakdown-bar {
+        display: flex;
+        height: 50px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+
+    .bar-segment {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d0d0d;
+        transition: all 0.3s ease;
+    }
+
+        .bar-segment.cash {
+            background: linear-gradient(90deg, #d4af37, #f0d060);
+        }
+
+        .bar-segment.card {
+            background: linear-gradient(90deg, #7a5e1a, #9a7a2a);
+            color: #fff;
+        }
+
+    .breakdown-legend {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .legend-row {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .legend-label {
+        color: #aaa;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+
+    .legend-total {
+        color: #d4af37;
+        font-size: 15px;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 12px 26px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+            transform: translateY(-1px);
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

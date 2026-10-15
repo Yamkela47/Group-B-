@@ -27,13 +27,17 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
   // ---------- Stylists ----------
   final List<_Stylist> _stylists = const [
-    _Stylist(name: 'Nqobile', rating: 4.8),
-    _Stylist(name: 'Thabo',   rating: 4.9),
-    _Stylist(name: 'Nkosi',   rating: 4.9),
-    _Stylist(name: 'Sipho',   rating: 4.9),
-    _Stylist(name: 'Lerato',  rating: 5.0),
+    _Stylist(id: 1, name: 'Nqobile', rating: 4.8),
+    _Stylist(id: 2, name: 'Thabo',   rating: 4.9),
+    _Stylist(id: 3, name: 'Nkosi',   rating: 4.9),
+    _Stylist(id: 4, name: 'Sipho',   rating: 4.9),
+    _Stylist(id: 5, name: 'Lerato',  rating: 5.0),
   ];
-  late String _stylist = widget.initialStylist ?? _stylists.first.name;
+  
+  late _Stylist _selectedStylist = _stylists.firstWhere(
+    (s) => s.name == widget.initialStylist,
+    orElse: () => _stylists.first,
+  );
 
   // ---------- Dates ----------
   DateTime _selectedDate = DateTime.now();
@@ -45,7 +49,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   // ---------- Time ----------
   String? _selectedTime;
 
-  // ---------- Taken slots (double-booking prevention) ----------
+  // ---------- Taken slots ----------
   Set<String> _takenSlots = {};
   bool _loadingSlots = false;
 
@@ -58,18 +62,12 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     imagePath: 'assets/images/standard_haircut.jpg',
   );
 
-  // =================================================================
-  //  LIFECYCLE
-  // =================================================================
   @override
   void initState() {
     super.initState();
     _refreshTakenSlots();
   }
 
-  // =================================================================
-  //  FETCH TAKEN SLOTS FROM SUPABASE
-  // =================================================================
   Future<void> _refreshTakenSlots() async {
     if (!mounted) return;
     setState(() => _loadingSlots = true);
@@ -83,7 +81,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       final data = await _supabase
           .from('bookings')
           .select('start_time')
-          .eq('stylist_name', _stylist)
+          .eq('stylist_id', _selectedStylist.id) 
           .eq('appointment_date', dateStr)
           .neq('status', 'cancelled');
 
@@ -101,10 +99,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       if (mounted) setState(() => _loadingSlots = false);
     }
   }
-
-  // =================================================================
-  //  HELPERS
-  // =================================================================
 
   String _weekdayShort(DateTime d) {
     const w = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -215,21 +209,15 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           service: _service.name,
           servicePrice: _service.price,
           serviceImagePath: _service.imagePath,
-          stylist: _stylist,
+          stylist: _selectedStylist.name,
           date: _selectedDate,
           time: _selectedTime!,
         ),
       ),
     ).then((_) {
-      // When user comes back, refresh the taken slots in case
-      // the booking succeeded or failed
       _refreshTakenSlots();
     });
   }
-
-  // =================================================================
-  //  BUILD
-  // =================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +290,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
         children: [
-          /* ---------- SERVICE TITLE ---------- */
           Text(_service.name,
               style: const TextStyle(
                   color: AppColors.gold,
@@ -314,11 +301,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                   color: AppColors.textSecondary, fontSize: 13)),
           const SizedBox(height: 16),
 
-          /* ---------- HERO CARD ---------- */
           _HeroServiceCard(service: _service),
           const SizedBox(height: 22),
 
-          /* ---------- STYLIST ---------- */
           Row(
             children: [
               const Text('Select a Stylist',
@@ -343,13 +328,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 14),
               itemBuilder: (_, i) {
                 final s = _stylists[i];
-                final selected = s.name == _stylist;
+                final selected = s.id == _selectedStylist.id;
                 return _StylistChip(
                   stylist: s,
                   selected: selected,
                   onTap: () {
                     setState(() {
-                      _stylist = s.name;
+                      _selectedStylist = s;
                       _selectedTime = null;
                     });
                     _refreshTakenSlots();
@@ -360,7 +345,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 22),
 
-          /* ---------- DATE ---------- */
           Row(
             children: [
               const Text('Select a Date',
@@ -418,7 +402,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 22),
 
-          /* ---------- TIME ---------- */
           Row(
             children: [
               const Text('Select Time',
@@ -900,9 +883,14 @@ class _ChipWrap extends StatelessWidget {
    DATA MODELS
    =================================================================== */
 class _Stylist {
+  final int id; // <--- THIS WAS MISSING!
   final String name;
   final double rating;
-  const _Stylist({required this.name, required this.rating});
+  const _Stylist({
+    required this.id, 
+    required this.name, 
+    required this.rating
+  });
 }
 
 class _ServiceInfo {

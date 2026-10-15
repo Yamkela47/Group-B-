@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cutting Edge Manager Portal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+    @{
+        var userEmail = Context.Session.GetString("UserEmail") ?? "manager@cuttingedge.co.za";
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+        var isAuthPage = currentController == "Account" || currentController == "Home";
+    }
+
+    @if (isAuthPage)
+    {
+        <!-- Auth pages render without sidebar -->
+        @RenderBody()
+    }
+    else
+    {
+        <div class="app-layout">
+
+            <!-- ========== SIDEBAR ========== -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <img src="~/images/cutting-edge-logo.jpeg" alt="Cutting Edge" class="sidebar-logo" />
+                    <div class="sidebar-brand">
+                        <h1>CUTTING EDGE</h1>
+                        <p>SALON MANAGEMENT SYSTEM</p>
+                        <span class="tagline">Our Vision. Your Style.</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a asp-controller="Dashboard" asp-action="Index"
+                       class="nav-item @(currentController == "Dashboard" ? "active" : "")">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+
+                    <a asp-controller="Bookings" asp-action="Index"
+                       class="nav-item @(currentController == "Bookings" ? "active" : "")">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">Bookings</span>
+                    </a>
+
+                    <a asp-controller="Stylists" asp-action="Index"
+                       class="nav-item @(currentController == "Stylists" ? "active" : "")">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-label">Stylists</span>
+                    </a>
+
+                    <a asp-controller="Services" asp-action="Index"
+                       class="nav-item @(currentController == "Services" || currentController == "Promotions" ? "active" : "")">
+                        <span class="nav-icon">✂️</span>
+                        <span class="nav-label">Services & Promotions</span>
+                    </a>
+
+                    <a asp-controller="Schedules" asp-action="Index"
+                       class="nav-item @(currentController == "Schedules" ? "active" : "")">
+                        <span class="nav-icon">🗓️</span>
+                        <span class="nav-label">Schedule</span>
+                    </a>
+
+                    <a asp-controller="Reports" asp-action="Index"
+                       class="nav-item @(currentController == "Reports" ? "active" : "")">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Reports</span>
+                    </a>
+
+                    <a asp-controller="Gallery" asp-action="Index"
+                       class="nav-item @(currentController == "Gallery" ? "active" : "")">
+                        <span class="nav-icon">🖼️</span>
+                        <span class="nav-label">Gallery</span>
+                    </a>
+
+                    <a asp-controller="Reviews" asp-action="Index"
+                       class="nav-item @(currentController == "Reviews" ? "active" : "")">
+                        <span class="nav-icon">⭐</span>
+                        <span class="nav-label">Reviews</span>
+                    </a>
+
+                    <a asp-controller="Profile" asp-action="Index"
+                       class="nav-item @(currentController == "Profile" ? "active" : "")">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-label">My Profile</span>
+                    </a>
+
+                    <div class="nav-divider"></div>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="nav-item nav-logout">
+                            <span class="nav-icon">↩</span>
+                            <span class="nav-label">Logout</span>
+                        </button>
+                    </form>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <p>Thank you for being part of the Cutting Edge Family!</p>
+                </div>
+            </aside>
+
+            <!-- ========== MAIN AREA ========== -->
+            <div class="main-area">
+
+                <!-- Top Bar -->
+                <header class="top-bar">
+                    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+
+                    <h2 class="page-title">@ViewData["Title"]</h2>
+
+                    <div class="top-bar-user">
+                        <div class="user-info">
+                            <div class="user-name">Thabo Mokwena</div>
+                            <div class="user-role">Manager</div>
+                        </div>
+                        <div class="user-avatar">
+                            <span>TM</span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page content -->
+                <main class="content-area">
+                    @RenderBody()
+                </main>
+
+                <!-- Footer -->
+                <footer class="app-footer">
+                    <p>© @DateTime.Now.Year Cutting Edge Salon — Our Vision. Your Style.</p>
+                </footer>
+            </div>
+        </div>
+    }
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('sidebar-open');
+            document.body.classList.toggle('sidebar-active');
+        }
+    </script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

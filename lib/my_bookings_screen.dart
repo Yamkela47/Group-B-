@@ -46,9 +46,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
         return;
       }
 
+      // FIXED: Added joins to fetch names and prices from related tables
       final data = await _supabase
           .from('bookings')
-          .select()
+          .select('*, services(name, price), stylists(name), payment_methods(method_name)')
           .eq('customer_id', user.id)
           .order('appointment_date', ascending: false);
 
@@ -88,7 +89,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
             style: TextStyle(color: Colors.white)),
         content: Text(
           'Are you sure you want to cancel your '
-          '${booking['service_name']} appointment?',
+          '${booking['services']?['name'] ?? 'appointment'}?',
           style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
@@ -109,13 +110,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
     if (confirm != true) return;
 
     try {
+      // FIXED: Changed 'id' to 'booking_id' to match Supabase schema
       await _supabase
           .from('bookings')
           .update({'status': 'cancelled'})
-          .eq('id', booking['id']);
+          .eq('booking_id', booking['booking_id']);
 
       await _supabase.from('cancellations').insert({
-        'booking_id': booking['id'],
+        'booking_id': booking['booking_id'],
         'cancelled_by': _supabase.auth.currentUser?.id,
         'reason': 'Cancelled by customer',
       });
@@ -144,9 +146,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
       context,
       MaterialPageRoute(
         builder: (_) => BookAppointmentScreen(
-          initialStylist: booking['stylist_name'],
-          service: booking['service_name'],
-          price: booking['service_price'],
+          initialStylist: booking['stylists']?['name'] ?? 'Any Stylist',
+          service: booking['services']?['name'] ?? 'Service',
+          price: booking['services']?['price']?.toString() ?? '0',
           showServicePicker: false,
         ),
       ),
@@ -228,7 +230,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
           : ListView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               children: [
-                /* ---------- TITLES ---------- */
                 const Text('My Bookings',
                     style: TextStyle(
                         color: AppColors.gold,
@@ -240,7 +241,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                         color: AppColors.textSecondary, fontSize: 13)),
                 const SizedBox(height: 20),
 
-                /* ---------- PILL TABS WITH COUNTS ---------- */
                 Row(
                   children: [
                     _PillTab(
@@ -267,7 +267,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
                 ),
                 const SizedBox(height: 20),
 
-                /* ---------- ACTIVE TAB CONTENT ---------- */
                 ..._buildTabContent(),
               ],
             ),
@@ -328,7 +327,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
           )),
       const SizedBox(height: 16),
 
-      /* ---------- INFO BOX ---------- */
       if (_tab.index == 0)
         Container(
           padding: const EdgeInsets.all(18),
@@ -363,7 +361,6 @@ class _MyBookingsScreenState extends State<MyBookingsScreen>
 
       const SizedBox(height: 18),
 
-      /* ---------- BOOK ANOTHER SERVICE ---------- */
       SizedBox(
         height: 52,
         child: ElevatedButton(
@@ -475,7 +472,6 @@ class _BookingCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /* ---------- IMAGE ---------- */
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.asset(
@@ -499,17 +495,16 @@ class _BookingCard extends StatelessWidget {
           ),
           const SizedBox(width: 14),
 
-          /* ---------- CONTENT ---------- */
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /* Service name + status badge */
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        booking['service_name'] ?? '—',
+                        // FIXED: Reading from joined services table
+                        booking['services']?['name'] ?? '—',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -540,54 +535,49 @@ class _BookingCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                /* Date */
                 _DetailLine(
                   icon: Icons.calendar_today_outlined,
                   text: _formatShortDate(booking['appointment_date']),
                 ),
                 const SizedBox(height: 5),
 
-                /* Time */
+                // FIXED: Fallback for start_time if not in DB yet
                 _DetailLine(
                   icon: Icons.access_time,
-                  text: _formatTime(booking['start_time']),
+                  text: _formatTime(booking['start_time'] ?? '09:00'),
                 ),
                 const SizedBox(height: 5),
 
-                /* Stylist */
                 _DetailLine(
                   icon: Icons.person_outline,
-                  text: booking['stylist_name'] ?? '—',
+                  // FIXED: Reading from joined stylists table
+                  text: booking['stylists']?['name'] ?? '—',
                 ),
                 const SizedBox(height: 5),
 
-                /* Payment */
                 _DetailLine(
                   icon: Icons.credit_card,
-                  text: booking['payment_method'] ?? 'Cash',
+                  // FIXED: Reading from joined payment_methods table
+                  text: booking['payment_methods']?['method_name'] ?? 'Cash',
                 ),
 
                 const SizedBox(height: 12),
 
-                /* ---------- ACTION BUTTONS ---------- */
                 if (onCancel != null && onReschedule != null)
                   Row(
                     children: [
-                      /* Confirmed pill (static) */
                       _ActionPill(
                         label: 'Confirmed',
                         color: AppColors.success,
                         onTap: null,
                       ),
                       const SizedBox(width: 6),
-                      /* Reschedule */
                       _ActionPill(
                         label: 'Reschedule',
                         color: AppColors.gold,
                         onTap: onReschedule!,
                       ),
                       const SizedBox(width: 6),
-                      /* Cancel */
                       _ActionPill(
                         label: 'Cancel',
                         color: AppColors.error,

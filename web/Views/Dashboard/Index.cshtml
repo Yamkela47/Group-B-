@@ -1,0 +1,380 @@
+﻿@model CuttingEdge.ManagerPortal.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Welcome back, Manager</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Summary Cards -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Today's Bookings</div>
+        <div class="metric-value">@Model.Metrics.TodayBookings</div>
+        <div class="metric-subtext">Scheduled for today</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Cancelled</div>
+        <div class="metric-value text-danger">@Model.Metrics.Cancelled</div>
+        <div class="metric-subtext">Total cancellations</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Estimated Revenue</div>
+        <div class="metric-value">R @Model.Metrics.EstimatedRevenue.ToString("N0")</div>
+        <div class="metric-subtext">From completed bookings</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Avg. Rating</div>
+        <div class="metric-value">4.6 <span class="star">★</span></div>
+        <div class="metric-subtext">Based on customer reviews</div>
+    </div>
+</div>
+
+<!-- Today's Schedule -->
+<div class="section">
+    <div class="section-header">
+        <h2>Today's Schedule</h2>
+        <a asp-controller="Bookings" asp-action="Index" class="link-view-all">View All Bookings →</a>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Stylist</th>
+                    <th>Price (R)</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.TodayBookings != null && Model.TodayBookings.Any())
+                {
+                    @foreach (var booking in Model.TodayBookings)
+                    {
+                        <tr>
+                            <td>@booking.StartTime.ToString(@"hh\:mm")</td>
+                            <td>@booking.Customer?.FullName</td>
+                            <td>@booking.Service?.Name</td>
+                            <td>@booking.Stylist?.Profile?.FullName</td>
+                            <td>@booking.Service?.Price.ToString("N0")</td>
+                            <td>@booking.PaymentMethod?.MethodName</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No bookings scheduled for today.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent Customer Feedback -->
+<div class="section">
+    <div class="section-header">
+        <h2>Recent Customer Feedback</h2>
+        <a asp-controller="Reviews" asp-action="Index" class="link-view-all">View All Reviews →</a>
+    </div>
+
+    <div class="feedback-list">
+        @if (Model.RecentReviews != null && Model.RecentReviews.Any())
+        {
+            @foreach (var review in Model.RecentReviews)
+            {
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <span class="feedback-customer">@review.Customer?.FullName</span>
+                        <span class="feedback-rating">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(i <= review.Rating ? "filled" : "")">★</span>
+                            }
+                        </span>
+                        <span class="feedback-stylist">Stylist: @review.Stylist?.Profile?.FullName</span>
+                        <span class="feedback-time">@review.CreatedAt.ToString("dd MMM, HH:mm")</span>
+                    </div>
+                    <div class="feedback-comment">"@review.Comment"</div>
+                    @if (review.FollowUpRequired && !review.Resolved)
+                    {
+                        <a asp-controller="Reviews" asp-action="FollowUp" asp-route-id="@review.ReviewId" class="follow-up-badge">
+                            FOLLOW UP
+                        </a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">No recent reviews available.</div>
+        }
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+        .page-header h1 {
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .page-header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+    /* ===== Metrics Cards ===== */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .metric-card {
+        background-color: #1a1a1a;
+        border: 1px solid #d4af37;
+        border-radius: 12px;
+        padding: 22px;
+        transition: all 0.3s ease;
+    }
+
+        .metric-card:hover {
+            border-color: #f0d060;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+            transform: translateY(-2px);
+        }
+
+    .metric-label {
+        color: #888;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        color: #fff;
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        line-height: 1.1;
+    }
+
+        .metric-value.text-danger {
+            color: #dc3545;
+        }
+
+        .metric-value .star {
+            color: #d4af37;
+            font-size: 22px;
+        }
+
+    .metric-subtext {
+        color: #666;
+        font-size: 12px;
+    }
+
+    /* ===== Section ===== */
+    .section {
+        margin-bottom: 35px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+        .section-header h2 {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .link-view-all {
+        color: #d4af37;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+        .link-view-all:hover {
+            text-decoration: underline;
+        }
+
+    /* ===== Table ===== */
+    .table-container {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .data-table thead {
+            background-color: #0d0d0d;
+        }
+
+        .data-table th {
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: left;
+            padding: 14px 18px;
+            border-bottom: 1px solid #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            color: #ddd;
+            font-size: 14px;
+            padding: 14px 18px;
+            border-bottom: 1px solid #222;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #222;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .text-center {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* ===== Feedback List ===== */
+    .feedback-list {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 10px 20px;
+    }
+
+    .feedback-item {
+        border-bottom: 1px solid #222;
+        padding: 16px 0;
+        position: relative;
+    }
+
+        .feedback-item:last-child {
+            border-bottom: none;
+        }
+
+    .feedback-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .feedback-customer {
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .feedback-rating .star {
+        color: #444;
+        font-size: 14px;
+    }
+
+        .feedback-rating .star.filled {
+            color: #d4af37;
+        }
+
+    .feedback-stylist {
+        color: #888;
+        font-size: 12px;
+    }
+
+    .feedback-time {
+        color: #555;
+        font-size: 12px;
+        margin-left: auto;
+    }
+
+    .feedback-comment {
+        color: #bbb;
+        font-size: 13px;
+        font-style: italic;
+        line-height: 1.5;
+    }
+
+    .follow-up-badge {
+        display: inline-block;
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .follow-up-badge:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .empty-state {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        padding: 30px 0;
+        font-size: 14px;
+    }
+
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

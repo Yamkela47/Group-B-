@@ -1,0 +1,381 @@
+﻿@model List<CuttingEdge.ManagerPortal.ViewModels.StylistScheduleViewModel>
+
+@{
+    ViewData["Title"] = "Schedule";
+    Layout = "_Layout";
+
+    var stylists = ViewBag.Stylists as List<CuttingEdge.ManagerPortal.Models.Stylist>;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Schedule</h1>
+        <p class="subtitle">Manage Stylist Schedules</p>
+    </div>
+    <a asp-action="Add" class="btn btn-primary">+ Add Schedule</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Filter Row -->
+<div class="filters-row">
+    <div class="filter-group">
+        <label>Stylist</label>
+        <select id="stylistFilter" class="form-control" onchange="filterSchedule()">
+            <option value="">All Stylists</option>
+            @if (stylists != null)
+            {
+                @foreach (var stylist in stylists)
+                {
+                    <option value="@stylist.StylistId">@stylist.Profile?.FullName</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Search</label>
+        <input type="text" id="searchInput" class="form-control" placeholder="Search stylist..." onkeyup="filterSchedule()" />
+    </div>
+</div>
+
+<!-- Schedule Table -->
+<div class="table-container">
+    <table class="data-table" id="scheduleTable">
+        <thead>
+            <tr>
+                <th>Stylist</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var schedule in Model)
+                {
+                    <tr data-stylist-id="@schedule.StylistId" data-stylist-name="@schedule.StylistName">
+                        <td class="stylist-name">
+                            <div class="stylist-cell">
+                                <div class="mini-avatar">@(schedule.StylistName?.Substring(0, 1)?.ToUpper() ?? "?")</div>
+                                <span>@schedule.StylistName</span>
+                            </div>
+                        </td>
+
+                        @foreach (var day in new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" })
+                        {
+                            var daySchedule = schedule.WeekSchedule.ContainsKey(day) ? schedule.WeekSchedule[day] : null;
+                            <td>
+                                @if (daySchedule != null && daySchedule.Enabled)
+                                {
+                                    <div class="schedule-cell working">
+                                        <span class="hours">@daySchedule.StartTime - @daySchedule.EndTime</span>
+                                        <span class="status-label">Working</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="schedule-cell off">
+                                        <span class="status-label">Off</span>
+                                    </div>
+                                }
+                            </td>
+                        }
+
+                        <td>
+                            <a asp-action="Edit" asp-route-stylistId="@schedule.StylistId" class="btn btn-outline btn-sm">Edit</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center">No schedules found. Click "+ Add Schedule" to create one.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function filterSchedule() {
+        const stylistFilter = document.getElementById('stylistFilter').value;
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#scheduleTable tbody tr');
+
+        rows.forEach(row => {
+            const rowStylistId = row.getAttribute('data-stylist-id');
+            const rowStylistName = (row.getAttribute('data-stylist-name') || '').toLowerCase();
+
+            const matchesStylist = !stylistFilter || rowStylistId === stylistFilter;
+            const matchesSearch = !searchTerm || rowStylistName.includes(searchTerm);
+
+            if (matchesStylist && matchesSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+        .page-header h1 {
+            color: #d4af37;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .page-header .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+    /* ===== Filters ===== */
+    .filters-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 220px;
+    }
+
+        .filter-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    /* ===== Table ===== */
+    .table-container {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+        .data-table thead {
+            background-color: #0d0d0d;
+        }
+
+        .data-table th {
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            color: #ddd;
+            font-size: 13px;
+            padding: 14px 12px;
+            border-bottom: 1px solid #222;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #222;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .stylist-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mini-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #0d0d0d;
+        border: 1.5px solid #d4af37;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d4af37;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .stylist-name {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* ===== Schedule Cells ===== */
+    .schedule-cell {
+        border-radius: 6px;
+        padding: 8px 10px;
+        text-align: center;
+        font-size: 12px;
+        min-width: 100px;
+    }
+
+        .schedule-cell.working {
+            background-color: rgba(212, 175, 55, 0.08);
+            border: 1px solid #d4af37;
+        }
+
+            .schedule-cell.working .hours {
+                display: block;
+                color: #d4af37;
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+
+            .schedule-cell.working .status-label {
+                color: #d4af37;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 600;
+            }
+
+        .schedule-cell.off {
+            background-color: #0d0d0d;
+            border: 1px solid #2a2a2a;
+        }
+
+            .schedule-cell.off .status-label {
+                color: #666;
+                font-size: 11px;
+                font-weight: 600;
+            }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid #d4af37;
+        color: #d4af37;
+    }
+
+        .btn-outline:hover {
+            background-color: #d4af37;
+            color: #0d0d0d;
+        }
+
+    .btn-sm {
+        padding: 7px 14px;
+        font-size: 12px;
+    }
+
+    .text-center {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

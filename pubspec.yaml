@@ -10,10 +10,14 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
+  supabase_flutter: ^2.18.3
+
+dev_dependencies:
   flutter_test:
     sdk: flutter
-  supabase_flutter: ^2.18.3
 
 flutter:
   uses-material-design: true
-  
+
+  assets:
+    - assets/images/

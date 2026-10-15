@@ -27,16 +27,8 @@ class PaymentMethodScreen extends StatefulWidget {
 
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   final _supabase = Supabase.instance.client;
-  String _payment = 'Cash';
-  bool _loading = false;
-
-  String _formatShortDate(DateTime d) {
-    const m = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    return '${d.day} ${m[d.month - 1]} ${d.year}';
-  }
+  String _selectedMethod = 'Cash';
+  bool _saving = false;
 
   String _formatLongDate(DateTime d) {
     const wd = [
@@ -50,116 +42,55 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     return '${wd[d.weekday - 1]}, ${d.day} ${mo[d.month - 1]} ${d.year}';
   }
 
-  void _message(String msg, {Color? color}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: color,
-        duration: const Duration(seconds: 4),
-      ),
-    );
-  }
-
-  Future<bool> _isSlotTaken() async {
-    try {
-      final dateStr =
-          '${widget.date.year.toString().padLeft(4, '0')}-'
-          '${widget.date.month.toString().padLeft(2, '0')}-'
-          '${widget.date.day.toString().padLeft(2, '0')}';
-
-      final data = await _supabase
-          .from('bookings')
-          .select('id')
-          .eq('stylist_name', widget.stylist)
-          .eq('appointment_date', dateStr)
-          .eq('start_time', '${widget.time}:00')
-          .neq('status', 'cancelled')
-          .limit(1);
-
-      return (data as List).isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
-
   Future<void> _confirmBooking() async {
-    setState(() => _loading = true);
+    setState(() => _saving = true);
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) {
-        _message('You must be signed in to book.',
-            color: AppColors.error);
-        return;
-      }
+      if (user == null) throw Exception('You must be signed in.');
 
-      /* ---------- App-side conflict check ---------- */
-      final taken = await _isSlotTaken();
-      if (!mounted) return;
+      // Convert payment method name to ID (1 = Cash, 2 = Card)
+      final paymentMethodId = _selectedMethod == 'Cash' ? 1 : 2;
 
-      if (taken) {
-        _message(
-          '${widget.stylist} is already booked at ${widget.time} on '
-          '${_formatShortDate(widget.date)}.',
-          color: AppColors.error,
-        );
-        return;
-      }
-
+      // Save the date as YYYY-MM-DD
       final dateStr =
           '${widget.date.year.toString().padLeft(4, '0')}-'
           '${widget.date.month.toString().padLeft(2, '0')}-'
           '${widget.date.day.toString().padLeft(2, '0')}';
 
-      final response = await _supabase
-          .from('bookings')
-          .insert({
-            'customer_id': user.id,
-            'stylist_name': widget.stylist,
-            'service_name': widget.service,
-            'service_price': widget.servicePrice,
-            'appointment_date': dateStr,
-            'start_time': '${widget.time}:00',
-            'payment_method': _payment,
-            'status': 'confirmed',
-          })
-          .select()
-          .single();
+      await _supabase.from('bookings').insert({
+        'customer_id': user.id,
+        'appointment_date': dateStr,
+        'start_time': widget.time,
+        'status': 'confirmed',
+        'payment_method_id': paymentMethodId,
+        // Note: If your bookings table doesn't have these columns, remove them:
+        // 'service_name': widget.service,
+        // 'stylist_name': widget.stylist,
+      });
 
       if (!mounted) return;
-      final bookingId = response['id'] as String;
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => BookingConfirmedScreen(
-            bookingId: bookingId,
             service: widget.service,
-            serviceImagePath: widget.serviceImagePath,
             stylist: widget.stylist,
-            date: _formatShortDate(widget.date),
+            date: _formatLongDate(widget.date),
             time: widget.time,
-            payment: _payment,
-            total: widget.servicePrice,
           ),
         ),
       );
-    } on PostgrestException catch (e) {
-      if (e.code == '23505') {
-        _message(
-          'That slot was just taken. Please pick another time.',
-          color: AppColors.error,
-        );
-      } else {
-        _message('Could not save booking: ${e.message}',
-            color: AppColors.error);
-      }
     } catch (e) {
-      _message('Something went wrong. Please try again.',
-          color: AppColors.error);
-    } finally {
-      if (mounted) setState(() => _loading = false);
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not save booking: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -171,10 +102,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         leadingWidth: 90,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 12),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 12),
             child: Row(
-              children: const [
+              children: [
                 Icon(Icons.arrow_back_ios_new,
                     color: Colors.white, size: 16),
                 SizedBox(width: 4),
@@ -201,10 +132,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   color: AppColors.gold, size: 13),
             ),
             const SizedBox(width: 10),
-            Column(
+            const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Text('CUTTING EDGE',
                     style: TextStyle(
                         color: AppColors.gold,
@@ -221,73 +152,149 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             ),
           ],
         ),
-        actions: const [SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: AppColors.border),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
         children: [
-          /* ---------- PAGE TITLE ---------- */
-          const Text('Payment Method',
+          const Text('Review & Pay',
               style: TextStyle(
                   color: AppColors.gold,
                   fontSize: 22,
                   fontWeight: FontWeight.w900)),
           const SizedBox(height: 6),
-          const Text('How would you like to pay?',
+          const Text('Confirm your appointment details below.',
               style: TextStyle(
                   color: AppColors.textSecondary, fontSize: 13)),
+          const SizedBox(height: 20),
+
+          /* ---------- SERVICE CARD ---------- */
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.gold, width: 1.2),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    widget.serviceImagePath,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.gold.withOpacity(0.4)),
+                      ),
+                      child: const Icon(Icons.content_cut,
+                          color: AppColors.gold, size: 26),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.service,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+                      Text(widget.stylist,
+                          style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12)),
+                      const SizedBox(height: 6),
+                      Text(widget.servicePrice,
+                          style: const TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          /* ---------- DETAILS ---------- */
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                _SummaryRow(
+                    icon: Icons.calendar_today_outlined,
+                    label: 'Date',
+                    value: _formatLongDate(widget.date)),
+                const SizedBox(height: 12),
+                _SummaryRow(
+                    icon: Icons.access_time,
+                    label: 'Time',
+                    value: widget.time),
+                const SizedBox(height: 12),
+                _SummaryRow(
+                    icon: Icons.payments_outlined,
+                    label: 'Total',
+                    value: widget.servicePrice),
+              ],
+            ),
+          ),
           const SizedBox(height: 22),
 
-          /* ---------- BOOKING SUMMARY ---------- */
-          _SummaryCard(
-            service: widget.service,
-            stylist: widget.stylist,
-            date: _formatLongDate(widget.date),
-            time: widget.time,
-            total: widget.servicePrice,
-          ),
-          const SizedBox(height: 24),
-
-          /* ---------- PAYMENT OPTIONS ---------- */
+          /* ---------- PAYMENT METHOD ---------- */
           const Text('Choose a Payment Method',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
-
-          _PayOption(
+          _PaymentOption(
             icon: Icons.payments_outlined,
-            label: 'Cash',
+            title: 'Cash',
             subtitle: 'Pay at the salon on arrival',
-            selected: _payment == 'Cash',
-            onTap: () => setState(() => _payment = 'Cash'),
+            selected: _selectedMethod == 'Cash',
+            onTap: () => setState(() => _selectedMethod = 'Cash'),
           ),
-          const SizedBox(height: 12),
-          _PayOption(
+          const SizedBox(height: 10),
+          _PaymentOption(
             icon: Icons.credit_card,
-            label: 'Card',
+            title: 'Card',
             subtitle: 'Tap or insert card on arrival',
-            selected: _payment == 'Card',
-            onTap: () => setState(() => _payment = 'Card'),
+            selected: _selectedMethod == 'Card',
+            onTap: () => setState(() => _selectedMethod = 'Card'),
           ),
+          const SizedBox(height: 14),
 
-          const SizedBox(height: 18),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Icon(Icons.info_outline, color: AppColors.gold, size: 16),
-              SizedBox(width: 8),
+            children: [
+              const Icon(Icons.info_outline,
+                  color: AppColors.gold, size: 14),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'No online payment is processed. Your chosen method will be '
                   'used when you pay at the salon.',
                   style: TextStyle(
-                    color: AppColors.textMuted,
+                    color: AppColors.textMuted.withOpacity(0.9),
                     fontSize: 11.5,
                     height: 1.4,
                   ),
@@ -308,15 +315,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           child: SizedBox(
             height: 52,
             child: ElevatedButton(
-              onPressed: _loading ? null : _confirmBooking,
-              child: _loading
+              onPressed: _saving ? null : _confirmBooking,
+              child: _saving
                   ? const SizedBox(
-                      width: 22,
-                      height: 22,
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(
-                        color: Colors.black,
-                        strokeWidth: 2.4,
-                      ),
+                          color: Colors.black, strokeWidth: 2),
                     )
                   : const Text('CONFIRM BOOKING'),
             ),
@@ -327,136 +332,46 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   }
 }
 
-/* ===================================================================
-   SUMMARY CARD
-   =================================================================== */
-class _SummaryCard extends StatelessWidget {
-  final String service;
-  final String stylist;
-  final String date;
-  final String time;
-  final String total;
-
-  const _SummaryCard({
-    required this.service,
-    required this.stylist,
-    required this.date,
-    required this.time,
-    required this.total,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.gold, width: 1.2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Booking Summary',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800)),
-          const SizedBox(height: 14),
-          _SummaryRow(
-              icon: Icons.content_cut, label: 'Service', value: service),
-          const _RowDivider(),
-          _SummaryRow(
-              icon: Icons.person_outline, label: 'Stylist', value: stylist),
-          const _RowDivider(),
-          _SummaryRow(
-              icon: Icons.calendar_today_outlined,
-              label: 'Date',
-              value: date),
-          const _RowDivider(),
-          _SummaryRow(icon: Icons.access_time, label: 'Time', value: time),
-          const _RowDivider(),
-          _SummaryRow(
-              icon: Icons.local_offer_outlined,
-              label: 'Total',
-              value: total,
-              valueIsGold: true),
-        ],
-      ),
-    );
-  }
-}
-
 class _SummaryRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final bool valueIsGold;
-
   const _SummaryRow({
     required this.icon,
     required this.label,
     required this.value,
-    this.valueIsGold = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.gold, size: 16),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: 62,
-            child: Text(label,
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 12.5)),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                color: valueIsGold ? AppColors.gold : Colors.white,
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.gold, size: 16),
+        const SizedBox(width: 10),
+        Text(label,
+            style: const TextStyle(
+                color: AppColors.textSecondary, fontSize: 13)),
+        const Spacer(),
+        Text(value,
+            style: const TextStyle(
+                color: Colors.white,
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+                fontWeight: FontWeight.w700)),
+      ],
     );
   }
 }
 
-class _RowDivider extends StatelessWidget {
-  const _RowDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1,
-      color: AppColors.gold.withOpacity(0.25),
-    );
-  }
-}
-
-/* ===================================================================
-   PAY OPTION
-   =================================================================== */
-class _PayOption extends StatelessWidget {
+class _PaymentOption extends StatelessWidget {
   final IconData icon;
-  final String label;
+  final String title;
   final String subtitle;
   final bool selected;
   final VoidCallback onTap;
 
-  const _PayOption({
+  const _PaymentOption({
     required this.icon,
-    required this.label,
+    required this.title,
     required this.subtitle,
     required this.selected,
     required this.onTap,
@@ -469,46 +384,52 @@ class _PayOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.gold.withOpacity(0.08)
-              : AppColors.surfaceAlt,
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.surfaceAlt,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: selected ? AppColors.gold : AppColors.border,
-            width: selected ? 1.6 : 1,
+            width: selected ? 1.8 : 1,
           ),
         ),
         child: Row(
           children: [
             Icon(icon,
-                color: selected
-                    ? AppColors.gold
-                    : AppColors.textSecondary,
-                size: 24),
+                color: selected ? AppColors.gold : AppColors.textSecondary,
+                size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: selected ? AppColors.gold : Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 2),
                   Text(subtitle,
                       style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 11.5)),
+                          color: AppColors.textSecondary, fontSize: 12)),
                 ],
               ),
             ),
-            if (selected)
-              const Icon(Icons.check_circle,
-                  color: AppColors.gold, size: 22),
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? AppColors.gold : AppColors.border,
+                  width: 2,
+                ),
+              ),
+              child: selected
+                  ? const Center(
+                      child: Icon(Icons.check,
+                          color: AppColors.gold, size: 14),
+                    )
+                  : null,
+            ),
           ],
         ),
       ),

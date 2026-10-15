@@ -1,0 +1,478 @@
+﻿@model List<CuttingEdge.ManagerPortal.Models.Review>
+
+@{
+    ViewData["Title"] = "Customer Reviews";
+    Layout = "_Layout";
+
+    var summary = ViewBag.Summary;
+    var stylists = ViewBag.Stylists as List<CuttingEdge.ManagerPortal.Models.Stylist>;
+}
+
+<div class="page-header">
+    <div>
+        <p class="breadcrumb">Dashboard → All Reviews</p>
+        <h1>Customer Reviews</h1>
+        <p class="subtitle">Browse and manage all customer feedback.</p>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Summary Cards -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Average Rating</div>
+        <div class="metric-value">
+            @(summary?.AverageRating.ToString("0.0") ?? "4.6") <span class="star">★</span>
+        </div>
+        <div class="metric-subtext">@(summary?.TotalReviews ?? 132) total reviews</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Total Reviews</div>
+        <div class="metric-value">@(summary?.TotalReviews ?? 132)</div>
+        <div class="metric-subtext">
+            <span class="trend-up">▲ 14 this week</span>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">Needs Follow Up</div>
+        <div class="metric-value text-danger">@(summary?.NeedsFollowUp ?? 6)</div>
+        <div class="metric-subtext">2 or fewer stars</div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <form method="get" asp-action="Index" class="filters-form">
+        <div class="filter-group">
+            <label>Search</label>
+            <input type="text" name="search" class="form-control" placeholder="customer / stylist" value="@ViewBag.SearchFilter" />
+        </div>
+
+        <div class="filter-group">
+            <label>Rating</label>
+            <select name="rating" class="form-control">
+                <option value="">All Ratings</option>
+                <option value="5" selected="@(ViewBag.RatingFilter == "5")">5 ★</option>
+                <option value="4" selected="@(ViewBag.RatingFilter == "4")">4 ★</option>
+                <option value="3" selected="@(ViewBag.RatingFilter == "3")">3 ★</option>
+                <option value="2" selected="@(ViewBag.RatingFilter == "2")">2 ★</option>
+                <option value="1" selected="@(ViewBag.RatingFilter == "1")">1 ★</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Stylist</label>
+            <select name="stylistId" class="form-control">
+                <option value="">All Stylists</option>
+                @if (stylists != null)
+                {
+                    @foreach (var stylist in stylists)
+                    {
+                        <option value="@stylist.StylistId" selected="@(ViewBag.StylistFilter?.ToString() == stylist.StylistId.ToString())">
+                            @stylist.Profile?.FullName
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control" value="@ViewBag.DateFilter" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a asp-action="Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Reviews List -->
+<div class="reviews-container">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var review in Model)
+        {
+            <div class="review-item">
+                <div class="review-row">
+                    <div class="review-main">
+                        <div class="review-header">
+                            <span class="review-customer">@review.Customer?.FullName</span>
+                            <span class="review-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star @(i <= review.Rating ? "filled" : "")">★</span>
+                                }
+                            </span>
+                            <span class="review-stylist">Stylist: @review.Stylist?.Profile?.FullName</span>
+                        </div>
+
+                        <div class="review-comment">"@review.Comment"</div>
+                    </div>
+
+                    <div class="review-actions">
+                        <span class="review-time">@review.CreatedAt.ToString("dd MMM, HH:mm")</span>
+
+                        @if (review.FollowUpRequired && !review.Resolved)
+                        {
+                            <a asp-action="FollowUp" asp-route-id="@review.ReviewId" class="follow-up-badge">
+                                FOLLOW UP
+                            </a>
+                        }
+                        else if (review.Resolved)
+                        {
+                            <span class="resolved-badge">✓ Resolved</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="pagination-info">
+            <span>Showing 1 - @Model.Count of @(summary?.TotalReviews ?? Model.Count) reviews</span>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No reviews found matching your filters.</p>
+        </div>
+    }
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    /* ===== Metrics ===== */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .metric-card {
+        background-color: #1a1a1a;
+        border: 1px solid #d4af37;
+        border-radius: 12px;
+        padding: 22px;
+        transition: all 0.3s ease;
+    }
+
+        .metric-card:hover {
+            border-color: #f0d060;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.12);
+        }
+
+    .metric-label {
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        color: #fff;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 6px;
+    }
+
+        .metric-value.text-danger {
+            color: #dc3545;
+        }
+
+        .metric-value .star {
+            color: #d4af37;
+            font-size: 22px;
+        }
+
+    .metric-subtext {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .trend-up {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    /* ===== Filters ===== */
+    .filters-row {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .filters-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 160px;
+    }
+
+        .filter-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* ===== Reviews List ===== */
+    .reviews-container {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 0 25px;
+    }
+
+    .review-item {
+        border-bottom: 1px solid #2a2a2a;
+        padding: 20px 0;
+    }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+    .review-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .review-main {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .review-customer {
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .review-rating .star {
+        color: #444;
+        font-size: 14px;
+    }
+
+        .review-rating .star.filled {
+            color: #d4af37;
+        }
+
+    .review-stylist {
+        color: #888;
+        font-size: 12px;
+    }
+
+    .review-comment {
+        color: #bbb;
+        font-size: 13px;
+        font-style: italic;
+        line-height: 1.5;
+        margin-top: 6px;
+    }
+
+    .review-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .review-time {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .follow-up-badge {
+        display: inline-block;
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+        .follow-up-badge:hover {
+            background-color: #dc3545;
+            color: #fff;
+            text-decoration: none;
+        }
+
+    .resolved-badge {
+        display: inline-block;
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .pagination-info {
+        text-align: center;
+        padding: 18px 0;
+        color: #888;
+        font-size: 13px;
+        border-top: 1px solid #2a2a2a;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+        .empty-state p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>

@@ -1,0 +1,152 @@
+@model CuttingEdge.ManagerPortal.ViewModels.GalleryViewModel
+
+@{
+    ViewData["Title"] = "Gallery";
+    Layout = "_Layout";
+}
+
+<style>
+    .page-header { margin-bottom: 25px; }
+    .page-header h1 { color: #d4af37; font-size: 28px; font-weight: 700; margin: 0; }
+    .page-header .subtitle { color: #888; font-size: 14px; margin: 5px 0 0 0; }
+
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 14px; }
+    .alert-success { background: rgba(40,167,69,.12); border: 1px solid #28a745; color: #6fdc8c; }
+    .alert-danger { background: rgba(220,53,69,.12); border: 1px solid #dc3545; color: #ff8a95; }
+
+    .panel { background: #111; border: 1px solid #d4af37; border-radius: 12px; padding: 22px; margin-bottom: 22px; }
+    .panel h2 { color: #d4af37; font-size: 17px; margin: 0 0 4px 0; }
+    .panel .hint { color: #888; font-size: 13px; margin: 0 0 14px 0; }
+
+    .upload-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; }
+    .field label { color: #fff; font-size: 13px; font-weight: 600; }
+
+    .form-control { background: #0a0a0a; border: 1px solid #5c4d17; color: #fff; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit; width: 100%; }
+    .form-control:focus { outline: none; border-color: #d4af37; }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+
+    .btn { display: inline-block; border: 1px solid #d4af37; border-radius: 8px; padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; }
+    .btn-primary { background: #f4b400; color: #000; border-color: #f4b400; }
+    .btn-primary:hover { background: #ffc61a; }
+    .btn-outline { background: transparent; color: #d4af37; }
+    .btn-outline:hover { background: rgba(212,175,55,.12); }
+    .btn-danger { background: transparent; color: #ff6b78; border-color: #dc3545; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .char-count { color: #888; font-size: 12px; margin-top: 6px; }
+
+    .gallery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .gallery-header h2 { margin: 0; }
+    .count-badge { color: #888; font-size: 13px; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+    .photo-card { background: #0a0a0a; border: 1px solid #3a3210; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+    .photo-card:hover { border-color: #d4af37; }
+    .photo-thumb { height: 150px; background: #161616 center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #5c4d17; font-size: 38px; }
+    .photo-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+    .photo-title { color: #fff; font-size: 14px; font-weight: 600; }
+    .photo-date { color: #888; font-size: 12px; }
+    .photo-actions { display: flex; gap: 8px; }
+    .empty-state { color: #888; text-align: center; padding: 30px; }
+</style>
+
+<div class="page-header">
+    <h1>Photo Gallery</h1>
+    <p class="subtitle">Upload and manage photos and keep your public "About Us" up to date.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Upload -->
+<div class="panel">
+    <h2>Upload Photos</h2>
+    <p class="hint">PNG or JPG, up to 5MB each.</p>
+    <form asp-action="Upload" method="post" enctype="multipart/form-data" class="upload-row">
+        @Html.AntiForgeryToken()
+        <div class="field">
+            <label for="file">Photo</label>
+            <input type="file" id="file" name="file" accept="image/png,image/jpeg" class="form-control" required />
+        </div>
+        <div class="field">
+            <label for="title">Caption</label>
+            <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Salon Interior" />
+        </div>
+        <div class="field">
+            <label for="description">Description (optional)</label>
+            <input type="text" id="description" name="description" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Photo</button>
+    </form>
+</div>
+
+<!-- About Us -->
+<div class="panel">
+    <h2>About Us</h2>
+    <p class="hint">This description appears on your public salon page.</p>
+    <form asp-action="UpdateAboutUs" method="post">
+        @Html.AntiForgeryToken()
+        <textarea name="aboutUs" id="aboutUs" class="form-control" maxlength="500" rows="3">@Model.AboutUs</textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+            <span class="char-count"><span id="aboutCount">@(Model.AboutUs?.Length ?? 0)</span>/500 characters</span>
+            <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<!-- Photos -->
+<div class="panel">
+    <div class="gallery-header">
+        <h2>All Photos</h2>
+        <span class="count-badge">@Model.Images.Count photos</span>
+    </div>
+
+    @if (Model.Images.Any())
+    {
+        <div class="gallery-grid">
+            @foreach (var img in Model.Images)
+            {
+                <div class="photo-card">
+                    @if (!string.IsNullOrEmpty(img.ImageUrl))
+                    {
+                        <div class="photo-thumb" style="background-image:url('@img.ImageUrl')"></div>
+                    }
+                    else
+                    {
+                        <div class="photo-thumb">🖼️</div>
+                    }
+                    <div class="photo-body">
+                        <div class="photo-title">@img.Title</div>
+                        <div class="photo-date">@img.CreatedAt.ToString("dd MMM yyyy")</div>
+                        <div class="photo-actions">
+                            <form asp-action="Delete" asp-route-id="@img.ImageId" method="post"
+                                  onsubmit="return confirm('Delete this photo?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">No photos yet. Upload your first photo above.</div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const about = document.getElementById('aboutUs');
+        const count = document.getElementById('aboutCount');
+        if (about && count) about.addEventListener('input', () => count.textContent = about.value.length);
+    </script>
+}
