@@ -7,10 +7,12 @@ namespace CuttingEdge.ManagerPortal.Controllers;
 public class BookingsController : Controller
 {
     private readonly SupabaseService _supabaseService;
+    private readonly ILogger<BookingsController> _logger;
 
-    public BookingsController(SupabaseService supabaseService)
+    public BookingsController(SupabaseService supabaseService, ILogger<BookingsController> logger)
     {
         _supabaseService = supabaseService;
+        _logger = logger;
     }
 
     // GET: /Bookings
@@ -34,7 +36,7 @@ public class BookingsController : Controller
     }
 
     // GET: /Bookings/Details/{id}
-    public async Task<IActionResult> Details(Guid id)
+    public async Task<IActionResult> Details(long id)
     {
         var booking = await _supabaseService.GetBookingByIdAsync(id);
         if (booking == null)
@@ -44,19 +46,24 @@ public class BookingsController : Controller
     }
 
     // GET: /Bookings/Reschedule/{id}
-    public async Task<IActionResult> Reschedule(Guid id)
+    public async Task<IActionResult> Reschedule(long id)
     {
         var booking = await _supabaseService.GetBookingByIdAsync(id);
         if (booking == null)
             return NotFound();
 
+        if (booking.Status is "Completed" or "Cancelled")
+        {
+            TempData["Error"] = "Completed and cancelled appointments cannot be rescheduled.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
         return View(booking);
     }
 
     // POST: /Bookings/Reschedule/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reschedule(Guid id, DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime)
+    public async Task<IActionResult> Reschedule(long id, DateTime appointmentDate, TimeSpan startTime)
     {
         try
         {
@@ -64,22 +71,48 @@ public class BookingsController : Controller
             if (booking == null)
                 return NotFound();
 
-            // Update the appointment time
-            booking.AppointmentDate = appointmentDate;
-            booking.StartTime = startTime;
-            booking.EndTime = endTime;
-
-            await _supabaseService.UpdateBookingAsync(booking);
-
-            // Optional: create a notification for the customer
-            await _supabaseService.CreateNotificationAsync(
-                booking.CustomerId,
-                "Appointment Rescheduled",
-                $"Your appointment has been rescheduled to {appointmentDate:dd MMM yyyy} at {startTime:hh\\:mm}.",
-                "Booking"
-            );
-
+            // The RPC changes the appointment atomically and checks for overlaps.
+            // Do not also patch the full Booking model: the date may have been saved
+            // even when a subsequent unrelated field/notification update fails.
+            var calculatedEnd = await _supabaseService.RescheduleBookingAsync(id, appointmentDate, startTime);
             TempData["Success"] = "Appointment rescheduled successfully.";
+
+            // Notification errors should NEVER be shown as rescheduling failures;
+            // the booking has already been updated by the RPC at this point.
+            var failedRecipients = new List<string>();
+            var message = $"Your appointment has been rescheduled to {appointmentDate:dd MMM yyyy} at {startTime:hh\\:mm}.";
+            try
+            {
+                await _supabaseService.CreateNotificationAsync(
+                    booking.CustomerId, "Appointment rescheduled", message, "booking");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Supabase customer reschedule notification failed for booking {BookingId}, profile {ProfileId}", id, booking.CustomerId);
+                failedRecipients.Add("customer");
+            }
+
+            if (booking.Stylist != null && booking.Stylist.ProfileId != booking.CustomerId)
+            {
+                try
+                {
+                    await _supabaseService.CreateNotificationAsync(
+                        booking.Stylist.ProfileId, "Appointment rescheduled",
+                        $"An assigned appointment has moved to {appointmentDate:dd MMM yyyy} at {startTime:hh\\:mm}.",
+                        "booking");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Supabase stylist reschedule notification failed for booking {BookingId}, profile {ProfileId}", id, booking.Stylist.ProfileId);
+                    failedRecipients.Add("stylist");
+                }
+            }
+
+            if (failedRecipients.Count != 0)
+                TempData["Error"] = "The booking was rescheduled, but the " +
+                    string.Join(" and ", failedRecipients) +
+                    " notification could not be saved. Check the ASP.NET server logs for the exact Supabase error.";
+
             return RedirectToAction(nameof(Details), new { id });
         }
         catch (Exception ex)
@@ -93,7 +126,7 @@ public class BookingsController : Controller
     // Marks the appointment Completed. It then disappears from the stylist's schedule.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Complete(Guid id, string? returnUrl = null)
+    public async Task<IActionResult> Complete(long id, string? returnUrl = null)
     {
         try
         {
@@ -111,8 +144,25 @@ public class BookingsController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    // POST: /Bookings/Cancel/{id} - manager cancellation always requires a reason.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(long id, string reason)
+    {
+        try
+        {
+            await _supabaseService.CancelBookingByManagerAsync(id, reason);
+            TempData["Success"] = "Booking cancelled and the reason recorded.";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Could not cancel booking: {ex.Message}";
+        }
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     // GET: /Bookings/Edit/{id}
-    public async Task<IActionResult> Edit(Guid id)
+    public async Task<IActionResult> Edit(long id)
     {
         var booking = await _supabaseService.GetBookingByIdAsync(id);
         if (booking == null)
@@ -124,7 +174,7 @@ public class BookingsController : Controller
     // POST: /Bookings/Edit/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, Booking booking)
+    public async Task<IActionResult> Edit(long id, Booking booking)
     {
         if (id != booking.BookingId)
             return NotFound();
