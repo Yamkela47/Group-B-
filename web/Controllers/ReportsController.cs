@@ -19,23 +19,16 @@ public class ReportsController : Controller
         {
             var report = await _supabaseService.GetReportAsync(period, from, to);
 
-            ViewBag.Period = period;
+            ViewBag.Period = report.Period;
             ViewBag.FromDate = from;
             ViewBag.ToDate = to;
-            ViewBag.CompletedBookings = report.CompletedBookings;
-            ViewBag.Cancelled = report.Cancelled;
-            ViewBag.CashRevenue = report.CashRevenue;
-            ViewBag.CardRevenue = report.CardRevenue;
-            ViewBag.TotalRevenue = report.TotalRevenue;
-            ViewBag.CashPercent = report.CashPercent;
-            ViewBag.CardPercent = report.CardPercent;
 
             return View(report);
         }
         catch (Exception ex)
         {
             TempData["Error"] = $"Error loading reports: {ex.Message}";
-            return View();
+            return View(new CuttingEdge.ManagerPortal.ViewModels.ReportData());
         }
     }
 
@@ -47,12 +40,24 @@ public class ReportsController : Controller
             var report = await _supabaseService.GetReportAsync(period, from, to);
             var pdfBytes = await _supabaseService.GenerateReportPdfAsync(report);
 
-            return File(pdfBytes, "application/pdf", $"Reports_{DateTime.UtcNow:MMMM_yyyy}.pdf");
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                TempData["Error"] = "PDF generation returned no data.";
+                return RedirectToAction(nameof(Index), new { period, from, to });
+            }
+
+            // Sanitize the filename to avoid browser rejections
+            var safeLabel = (report.PeriodLabel ?? "Report")
+                .Replace(" ", "_")
+                .Replace("/", "-")
+                .Replace("\\", "-");
+
+            return File(pdfBytes, "application/pdf", $"Reports_{safeLabel}.pdf");
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error downloading report: {ex.Message}";
-            return RedirectToAction(nameof(Index));
+            TempData["Error"] = $"Download failed: {ex.Message}";
+            return RedirectToAction(nameof(Index), new { period, from, to });
         }
     }
 }
