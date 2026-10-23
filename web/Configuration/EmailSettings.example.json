@@ -1,0 +1,15 @@
+{
+  "Email": {
+    "SmtpHost": "smtp.gmail.com",
+    "SmtpPort": "587",
+    "SmtpUser": "frameworkfanatic@gmail.com",
+    "SmtpPass": "oaxnglcofclybkjl",
+    "FromEmail": "frameworkfanatic@gmail.com",
+    "FromName": "Cutting Edge Salon",
+    "RecoveryCodeSecret": "sb_secret_QJALO49kATK30GW89N58aA_cmMm6csy"
+  },
+  "Supabase": {
+    "ServiceRoleKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoamZyZ3hsaXJtZHBlbm5ncG9oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzU1NTc5MywiZXhwIjoyMTAzMTMxNzkzfQ.ksiEVQzWKf5bDa2GWAbmE225ocWFW0_joNmTj8WMZ88"
+  }
+}
+
