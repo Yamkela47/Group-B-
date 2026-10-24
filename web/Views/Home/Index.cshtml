@@ -1,0 +1,932 @@
+﻿@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@{
+    ViewData["Title"] = "Welcome to Cutting Edge";
+    Layout = "_Layout";
+}
+
+<!-- CUTTING EDGE WELCOME PAGE -->
+
+<div class="ce-welcome" id="top">
+    <div class="ce-welcome-shell">
+
+        <!-- HEADER -->
+        <header class="ce-welcome-header">
+
+            <a class="ce-brand"
+               asp-controller="Home"
+               asp-action="Index">
+
+                <span class="ce-brand-mark">
+                    <img src="~/images/cutting-edge-logo.jpeg"
+                         alt="Cutting Edge Salon Logo" />
+                </span>
+
+                <span class="ce-brand-copy">
+                    <strong>CUTTING EDGE</strong>
+
+                    <span class="ce-brand-subtitle">
+                        SALON MANAGEMENT SYSTEM
+                    </span>
+
+                    <span class="ce-brand-motto">
+                        Our Vision Your Style
+                    </span>
+                </span>
+
+            </a>
+
+            <div class="ce-header-slogan">
+                <span>BEAUTY</span>
+                <span>PEOPLE</span>
+                <span>BUSINESS</span>
+                <span>TOGETHER</span>
+                <i></i>
+            </div>
+
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="ce-welcome-main">
+
+            <section class="ce-welcome-hero">
+
+                <!-- LEFT CONTENT -->
+                <div class="ce-hero-copy">
+
+                    <div class="ce-eyebrow">
+                        <i></i>
+                        <span>A SMARTER SALON TOMORROW</span>
+                    </div>
+
+                    <p class="ce-intro">
+                        Welcome to
+                    </p>
+
+                    <h1>
+                        CUTTING EDGE
+                    </h1>
+
+                    <p class="ce-hero-subtitle">
+                        SALON MANAGEMENT SYSTEM
+                    </p>
+
+                    <p class="ce-hero-description">
+                        Manage bookings, stylists, services,
+                        schedules and reports —
+                        all in one powerful system.
+                    </p>
+
+                    <!-- BUTTONS -->
+                    <div class="ce-hero-actions">
+
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="ce-hero-login">
+
+                            <svg viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.9"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+
+                                <path d="M16 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <path d="M20 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+
+                            </svg>
+
+                            <span>
+                                Login as Manager / Staff
+                            </span>
+
+                            <span class="ce-action-arrow">
+                                ›
+                            </span>
+
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT LOGO -->
+                <div class="ce-hero-visual">
+
+                    <div class="ce-logo-orbit">
+
+                        <img src="~/images/cutting-edge-logo.jpeg"
+                             alt="Cutting Edge Salon"
+                             class="ce-large-logo" />
+
+                    </div>
+
+                    <div class="ce-visual-motto">
+
+                        <span>GOOD</span>
+                        <span>HAIR</span>
+                        <span>BRIGHTER</span>
+                        <span>DAYS</span>
+
+                        <i></i>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- FEATURE CARDS -->
+            <section class="ce-features"
+                     id="ceWelcomeFeatures">
+
+                <!-- BOOKINGS -->
+                <article class="ce-feature">
+
+                    <div class="ce-feature-icon">
+
+                        <svg viewBox="0 0 48 48"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <rect x="8"
+                                  y="12"
+                                  width="32"
+                                  height="28"
+                                  rx="3" />
+
+                            <path d="M15 7v10M33 7v10M8 21h32" />
+
+                        </svg>
+
+                    </div>
+
+                    <div>
+                        <h2>Manage Bookings</h2>
+
+                        <p>
+                            Keep your calendar organized
+                        </p>
+                    </div>
+
+                </article>
+
+                <!-- REVENUE -->
+                <article class="ce-feature">
+
+                    <div class="ce-feature-icon">
+
+                        <svg viewBox="0 0 48 48"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linejoin="round">
+
+                            <rect x="8"
+                                  y="26"
+                                  width="7"
+                                  height="14"
+                                  rx="1" />
+
+                            <rect x="21"
+                                  y="13"
+                                  width="7"
+                                  height="27"
+                                  rx="1" />
+
+                            <rect x="34"
+                                  y="21"
+                                  width="7"
+                                  height="19"
+                                  rx="1" />
+
+                        </svg>
+
+                    </div>
+
+                    <div>
+                        <h2>Track Revenue</h2>
+
+                        <p>
+                            Gain insights and grow your business
+                        </p>
+                    </div>
+
+                </article>
+
+                <!-- SALON PHOTOS -->
+                <article class="ce-feature">
+
+                    <div class="ce-feature-icon">
+
+                        <svg viewBox="0 0 48 48"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <rect x="8"
+                                  y="11"
+                                  width="32"
+                                  height="27"
+                                  rx="3" />
+
+                            <circle cx="19"
+                                    cy="21"
+                                    r="3" />
+
+                            <path d="m10 34 11-10 7 7 5-5 7 6" />
+
+                        </svg>
+
+                    </div>
+
+                    <div>
+                        <h2>Upload Salon Photos</h2>
+
+                        <p>
+                            Showcase your work and attract clients
+                        </p>
+                    </div>
+
+                </article>
+
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="ce-welcome-footer">
+
+            <div class="ce-footer-label">
+                PREMIUM TOOLS FOR REMARKABLE SALONS
+                <i></i>
+            </div>
+
+            <span>
+                © @DateTime.Now.Year Cutting Edge Salon.
+                All rights reserved.
+            </span>
+
+        </footer>
+
+    </div>
+</div>
+
+<style>
+
+    /* GENERAL WELCOME PAGE */
+
+    .ce-welcome,
+    .ce-welcome * {
+        box-sizing: border-box;
+    }
+
+    .ce-welcome {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+        background: #080808;
+        color: #f6f6f6;
+        isolation: isolate;
+    }
+
+        /* GOLD BACKGROUND LIGHTING */
+
+        .ce-welcome::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background: radial-gradient( ellipse 42% 57% at 73% 37%, rgba(167,103,0,.28), transparent 73% ), radial-gradient( ellipse 43% 43% at 1% 0%, rgba(190,131,12,.20), transparent 80% ), radial-gradient( ellipse 39% 39% at 47% 100%, rgba(144,88,2,.14), transparent 75% ), linear-gradient( 125deg, #030303 0%, #0a0a09 50%, #10100c 75%, #060606 100% );
+        }
+
+        /* DIAGONAL GOLD ACCENTS */
+
+        .ce-welcome::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            pointer-events: none;
+            opacity: .92;
+            background: linear-gradient( 126deg, transparent 0 5%, rgba(164,109,9,.42) 5.06%, rgba(208,151,21,.10) 7.4%, transparent 7.5% ), linear-gradient( 126deg, transparent 0 41%, rgba(181,120,14,.08) 41.1%, rgba(123,79,10,.24) 46%, transparent 46.1% ), linear-gradient( 126deg, transparent 0 48%, rgba(250,187,40,.87) 48.06%, rgba(255,203,72,.27) 48.23%, transparent 48.55% ), linear-gradient( 126deg, transparent 0 90%, rgba(255,198,38,.85) 90.08%, transparent 90.35% );
+        }
+
+    .ce-welcome-shell {
+        width: min(1480px, calc(100% - 100px));
+        margin: 0 auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* HEADER */
+
+    .ce-welcome-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 30px;
+        padding-top: 32px;
+    }
+
+    .ce-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 19px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .ce-brand-mark {
+        width: 116px;
+        height: 116px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #050505;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 2px rgba(255,255,255,.65);
+    }
+
+        .ce-brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+    .ce-brand-copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2px;
+    }
+
+        .ce-brand-copy strong {
+            color: #f3c941;
+            font-size: clamp(21px, 2vw, 30px);
+            letter-spacing: .27em;
+            font-weight: 700;
+            white-space: nowrap;
+            line-height: 1.25;
+        }
+
+    .ce-brand-subtitle {
+        font-size: clamp(9px, .91vw, 13px);
+        letter-spacing: .36em;
+        color: #ddd;
+        white-space: nowrap;
+    }
+
+    .ce-brand-motto {
+        color: #edb526;
+        font-size: clamp(20px, 2.3vw, 33px);
+        font-style: italic;
+        font-family: "Brush Script MT", "Segoe Script", cursive;
+        line-height: 1.35;
+    }
+
+    .ce-header-slogan {
+        display: flex;
+        align-items: center;
+        gap: clamp(15px, 1.8vw, 29px);
+        margin-top: 23px;
+        color: #e4e4e4;
+        font-size: 12px;
+        letter-spacing: .27em;
+        white-space: nowrap;
+    }
+
+        .ce-header-slogan i {
+            width: 68px;
+            height: 2px;
+            background: #ffc800;
+            display: inline-block;
+        }
+
+    /* MAIN HERO */
+
+    .ce-welcome-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .ce-welcome-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+        align-items: center;
+        gap: 35px;
+        min-height: 430px;
+        padding: 18px 0 8px;
+    }
+
+    .ce-hero-copy {
+        min-width: 0;
+    }
+
+    .ce-eyebrow {
+        display: flex;
+        gap: 28px;
+        align-items: center;
+        margin-bottom: 24px;
+        color: #aaa;
+        font-size: 12px;
+        letter-spacing: .36em;
+        font-weight: 500;
+    }
+
+        .ce-eyebrow i {
+            height: 2px;
+            width: 40px;
+            display: block;
+            flex-shrink: 0;
+            background: #ffcb23;
+        }
+
+    .ce-intro {
+        font-size: clamp(38px, 3.8vw, 60px);
+        letter-spacing: -.055em;
+        font-weight: 300;
+        margin: 0 0 -5px;
+        line-height: 1.17;
+    }
+
+    .ce-hero-copy h1 {
+        font-size: clamp(49px, 5.65vw, 88px);
+        letter-spacing: -.045em;
+        font-weight: 800;
+        line-height: 1.04;
+        white-space: nowrap;
+        margin: 5px 0 8px;
+        background: linear-gradient( 175deg, #ffe780 2%, #ffc521 43%, #b67704 80%, #f7c33e 98% );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .ce-hero-subtitle {
+        margin: 0 0 29px 5px;
+        color: #dbdbdb;
+        font-size: clamp(11px, 1.22vw, 18px);
+        letter-spacing: .41em;
+        white-space: nowrap;
+    }
+
+    .ce-hero-description {
+        font-size: clamp(16px, 1.25vw, 20px);
+        line-height: 1.65;
+        color: #c9c9c9;
+        max-width: 660px;
+        margin: 0 0 31px 5px;
+    }
+
+    /* BUTTONS */
+
+    .ce-hero-actions {
+        display: flex;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+        .ce-hero-actions a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            min-height: 62px;
+            border-radius: 10px;
+            padding: 12px 19px;
+            font-size: clamp(13px, 1.05vw, 17px);
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .2s, transform .2s;
+        }
+
+            .ce-hero-actions a:hover {
+                transform: translateY(-2px);
+            }
+
+    .ce-hero-login {
+        background: linear-gradient( 135deg, #ffd21d 0%, #fac006 100% );
+        color: #080808;
+        flex: 1.4;
+    }
+
+        .ce-hero-login:hover {
+            background: #ffe05c;
+            color: #080808;
+        }
+
+        .ce-hero-login svg {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+    .ce-action-arrow {
+        margin-left: auto;
+        font-size: 29px;
+        line-height: .8;
+        font-weight: 400;
+    }
+
+    .ce-hero-learn {
+        border: 2px solid #e1b000;
+        background: rgba(0,0,0,.51);
+        color: #f1c400;
+        flex: .8;
+    }
+
+        .ce-hero-learn:hover {
+            background: rgba(255,197,0,.10);
+            color: #ffda48;
+        }
+
+        .ce-hero-learn span:last-child {
+            margin-left: auto;
+            font-size: 30px;
+            line-height: .8;
+            font-weight: 400;
+        }
+
+    /* LARGE LOGO */
+
+    .ce-hero-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(20px, 3vw, 55px);
+        position: relative;
+        min-width: 0;
+    }
+
+    .ce-logo-orbit {
+        width: clamp(250px, 26vw, 425px);
+        height: clamp(250px, 26vw, 425px);
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        position: relative;
+        background: #030303;
+        border: 3px solid #d5a52b;
+        box-shadow: 0 0 0 6px rgba(148,99,11,.22), 0 0 30px rgba(245,176,29,.55), 0 0 100px rgba(216,136,13,.24);
+    }
+
+    .ce-large-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .ce-visual-motto {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        color: #f5c741;
+        font-size: clamp(14px, 1.25vw, 21px);
+        letter-spacing: .28em;
+        white-space: nowrap;
+        line-height: 1.7;
+    }
+
+        .ce-visual-motto i {
+            width: 80px;
+            height: 2px;
+            background: #f7c32d;
+            margin-top: 22px;
+        }
+
+    /* FEATURE CARDS */
+
+    .ce-features {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+        margin: 26px 0 30px;
+        scroll-margin-top: 30px;
+    }
+
+    .ce-feature {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        min-height: 135px;
+        padding: 23px 28px;
+        border-radius: 13px;
+        border: 1px solid rgba(204,156,49,.31);
+        background: linear-gradient( 120deg, rgba(20,20,20,.80), rgba(18,18,18,.65) );
+    }
+
+    .ce-feature-icon {
+        width: 83px;
+        height: 83px;
+        border: 2px solid #e7b800;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #e9ba0d;
+    }
+
+        .ce-feature-icon svg {
+            width: 42px;
+            height: 42px;
+        }
+
+    .ce-feature h2 {
+        color: #eee;
+        font-size: 18px;
+        font-weight: 650;
+        line-height: 1.3;
+        margin: 0 0 8px;
+    }
+
+    .ce-feature p {
+        font-size: 15px;
+        line-height: 1.55;
+        margin: 0;
+        color: #aaa;
+    }
+
+    /* FOOTER */
+
+    .ce-welcome-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+        padding: 24px 0 26px;
+        color: #868686;
+        font-size: 12px;
+    }
+
+    .ce-footer-label {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        white-space: nowrap;
+        letter-spacing: .27em;
+    }
+
+        .ce-footer-label i {
+            height: 1px;
+            display: block;
+            width: clamp(70px, 27vw, 545px);
+            background: linear-gradient( to right, #ffcb24, rgba(255,203,36,.8) );
+        }
+
+    /* RESPONSIVE DESIGN */
+
+    @@media (max-width: 1250px) {
+
+        .ce-welcome-shell {
+            width: min(1140px, calc(100% - 56px));
+        }
+
+        .ce-header-slogan {
+            font-size: 10px;
+            gap: 14px;
+        }
+
+            .ce-header-slogan i {
+                width: 40px;
+            }
+
+        .ce-hero-visual {
+            gap: 15px;
+        }
+
+        .ce-logo-orbit {
+            width: clamp(220px, 27vw, 355px);
+            height: clamp(220px, 27vw, 355px);
+        }
+
+        .ce-visual-motto {
+            letter-spacing: .17em;
+        }
+
+        .ce-hero-actions a {
+            gap: 10px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .ce-feature {
+            gap: 15px;
+            padding: 18px;
+        }
+
+        .ce-feature-icon {
+            width: 68px;
+            height: 68px;
+        }
+
+        .ce-feature h2 {
+            font-size: 16px;
+        }
+    }
+
+    @@media (max-width: 970px) {
+
+        .ce-welcome-header {
+            align-items: center;
+        }
+
+        .ce-header-slogan {
+            display: none;
+        }
+
+        .ce-welcome-hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding-top: 35px;
+            gap: 32px;
+        }
+
+        .ce-eyebrow {
+            justify-content: center;
+        }
+
+        .ce-hero-subtitle {
+            white-space: normal;
+        }
+
+        .ce-hero-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .ce-hero-actions {
+            max-width: 620px;
+            margin: auto;
+        }
+
+        .ce-hero-visual {
+            margin: auto;
+        }
+
+        .ce-features {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ce-feature:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .ce-footer-label i {
+            width: 100px;
+        }
+    }
+
+    @@media (max-width: 600px) {
+
+        .ce-welcome-shell {
+            width: calc(100% - 32px);
+        }
+
+        .ce-welcome-header {
+            padding-top: 22px;
+        }
+
+        .ce-brand {
+            gap: 10px;
+        }
+
+        .ce-brand-mark {
+            width: 72px;
+            height: 72px;
+        }
+
+        .ce-brand-copy strong {
+            font-size: 17px;
+            letter-spacing: .15em;
+        }
+
+        .ce-brand-subtitle {
+            font-size: 7px;
+            letter-spacing: .2em;
+        }
+
+        .ce-brand-motto {
+            font-size: 20px;
+        }
+
+        .ce-eyebrow {
+            font-size: 9px;
+            letter-spacing: .22em;
+            gap: 13px;
+            margin-bottom: 19px;
+        }
+
+            .ce-eyebrow i {
+                width: 20px;
+            }
+
+        .ce-intro {
+            font-size: 39px;
+        }
+
+        .ce-hero-copy h1 {
+            font-size: clamp(37px, 10vw, 55px);
+        }
+
+        .ce-hero-subtitle {
+            font-size: 9px;
+            letter-spacing: .24em;
+        }
+
+        .ce-hero-description {
+            font-size: 15px;
+        }
+
+        .ce-hero-actions {
+            flex-direction: column;
+        }
+
+            .ce-hero-actions a {
+                flex: auto;
+                min-height: 56px;
+            }
+
+        .ce-hero-visual {
+            gap: 12px;
+        }
+
+        .ce-logo-orbit {
+            width: min(65vw, 300px);
+            height: min(65vw, 300px);
+        }
+
+        .ce-visual-motto {
+            font-size: 10px;
+            letter-spacing: .11em;
+        }
+
+            .ce-visual-motto i {
+                width: 48px;
+            }
+
+        .ce-features {
+            grid-template-columns: 1fr;
+            margin-top: 34px;
+        }
+
+        .ce-feature:last-child {
+            grid-column: auto;
+        }
+
+        .ce-feature {
+            min-height: 108px;
+        }
+
+        .ce-welcome-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 9px;
+            font-size: 10px;
+        }
+
+        .ce-footer-label {
+            white-space: normal;
+            letter-spacing: .14em;
+        }
+
+            .ce-footer-label i {
+                width: 30px;
+            }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+
+        .ce-hero-actions a {
+            transition: none;
+        }
+
+            .ce-hero-actions a:hover {
+                transform: none;
+            }
+    }
+
+</style>

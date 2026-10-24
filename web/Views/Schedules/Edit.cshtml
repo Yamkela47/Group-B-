@@ -1,0 +1,760 @@
+﻿@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@using CuttingEdge.ManagerPortal.Models
+@model CuttingEdge.ManagerPortal.ViewModels.ScheduleViewModel
+
+@{
+    ViewData["Title"] = "Edit Schedule";
+    Layout = "_Layout";
+
+    var bookings = ViewBag.Bookings as List<Booking>;
+    var pendingLeave = ViewBag.PendingLeaveGroups as List<LeaveRequestGroup>
+                       ?? new List<LeaveRequestGroup>();
+    var thisMonday = DateTime.Today.AddDays(-(((int)DateTime.Today.DayOfWeek + 6) % 7));
+    var hasPrevious = Model.WeekStart > thisMonday;
+    var hasNext = Model.WeekStart < thisMonday.AddDays(49);
+    var previousWeek = Model.WeekStart.AddDays(-7).ToString("yyyy-MM-dd");
+    var nextWeek = Model.WeekStart.AddDays(7).ToString("yyyy-MM-dd");
+}
+
+<div class="page-header">
+    <p class="breadcrumb">Schedule > Edit Schedule</p>
+    <p class="subtitle">Manage working hours for the actual dates of the selected week.</p>
+    <p class="subtitle" style="color:#d4af37;">Blocked dates are automatically Off; their reasons appear below each date. Days with active bookings cannot be changed.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (pendingLeave.Any())
+{
+    <div style="background:#1f1a0d;border:1px solid #d4af37;border-radius:11px;padding:15px 18px;margin-bottom:18px;">
+        <strong style="color:#f0d06b;">&#9888; New notification: pending leave / blocked-date request</strong>
+        <ul style="margin:8px 0 0;padding-left:20px;color:#ddd;font-size:13px;">
+            @foreach (var g in pendingLeave)
+            {
+                <li style="margin-bottom:6px;">
+                    <span style="color:#f0d06b;">@g.RangeLabel</span>
+                    <span style="color:#888;">(@g.TypeLabel)</span> — @g.Reason
+                    <div style="margin-top:4px;display:flex;gap:8px;">
+                        @if (g.EnquiryId > 0)
+                        {
+                            <a asp-controller="Enquiries" asp-action="Details" asp-route-id="@g.EnquiryId"
+                               style="display:inline-block;padding:5px 12px;border:1px solid #d4af37;border-radius:6px;color:#d4af37;text-decoration:none;font-size:12px;">
+                                Review request &amp; decide
+                            </a>
+                        }
+                        else
+                        {
+                            <span style="color:#ff9fa6;font-size:12px;">Enquiry link not found — open Enquiries to review.</span>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+        <a asp-controller="Enquiries" asp-action="Index" style="color:#d4af37;font-size:13px;">Review in Enquiries →</a>
+    </div>
+}
+
+<div class="edit-grid">
+
+    <div class="schedule-card">
+        <form asp-action="Edit" asp-route-stylistId="@Model.StylistId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="StylistId" />
+            <input type="hidden" name="WeekStart" value="@Model.WeekStart.ToString("yyyy-MM-dd")" />
+
+            <div class="form-group">
+                <label>Stylist</label>
+                <input type="text" class="form-control" value="@Model.StylistName" readonly />
+            </div>
+
+            <div class="days-section">
+                <div class="week-toolbar">
+                    <div>
+                        <h2>Working hours for this week</h2>
+                        <p class="week-range">@Model.WeekStart.ToString("dd MMM") – @Model.WeekStart.AddDays(6).ToString("dd MMM yyyy")</p>
+                    </div>
+                    <nav class="week-nav" aria-label="Navigate schedule weeks">
+                        @if (hasPrevious)
+                        {
+                            <a asp-action="Edit" asp-route-stylistId="@Model.StylistId" asp-route-week="@previousWeek">&larr; Previous</a>
+                        }
+                        @if (hasNext)
+                        {
+                            <a asp-action="Edit" asp-route-stylistId="@Model.StylistId" asp-route-week="@nextWeek">Next &rarr;</a>
+                        }
+                    </nav>
+                </div>
+                <p class="section-subtitle">Each switch applies to the date shown, not every occurrence of that weekday. Blocked and booked dates are protected.</p>
+
+                <div class="days-table">
+                    <div class="days-header">
+                        <div class="col-day">Date</div>
+                        <div class="col-status">Status</div>
+                        <div class="col-time">Start Time</div>
+                        <div class="col-time">End Time</div>
+                    </div>
+
+                    @for (int i = 0; i < Model.DateRows.Count; i++)
+                    {
+                        var day = Model.DateRows[i];
+                        var protectedDate = day.IsBlocked || day.HasBooking || day.IsPast;
+                        var displayEnabled = !day.IsBlocked && day.Enabled;
+                        var reason = day.BlockedReason ?? "No reason provided";
+                        if (reason.Equals("person leave", StringComparison.OrdinalIgnoreCase)) reason = "Personal leave";
+                        var toggleId = $"scheduleDay{i}";
+                        <div class="day-row @(day.IsBlocked ? "blocked-week-row" : "")">
+                            <input type="hidden" name="DateRows[@i].Date" value="@day.Date.ToString("yyyy-MM-dd")" />
+                            <div class="col-day">
+                                <span class="day-name">@day.Date.ToString("dddd")</span>
+                                <small class="day-full-date">@day.Date.ToString("dd MMM yyyy")</small>
+                                @if (day.IsBlocked)
+                                {
+                                    <small class="day-specific-off">Unavailable — @reason</small>
+                                }
+                                else if (day.HasBooking)
+                                {
+                                    <small class="day-booked-note">Booking protected</small>
+                                }
+                                else if (day.IsPast)
+                                {
+                                    <small class="day-past-note">Past date</small>
+                                }
+                            </div>
+                            <div class="col-status">
+                                <label class="toggle-switch" for="@toggleId" title="@(day.IsBlocked ? "Blocked by the stylist" : day.HasBooking ? "Booking protected" : day.IsPast ? "Past date" : "Edit availability")">
+                                    <input id="@toggleId" type="checkbox"
+                                           name="DateRows[@i].Enabled"
+                                           value="true"
+                                           class="day-toggle"
+                                           data-target="@i"
+                                           checked="@displayEnabled"
+                                           disabled="@protectedDate"
+                                           aria-label="@day.Date.ToString("dd MMM yyyy") available" />
+                                    <span class="slider"></span>
+                                </label>
+                                @if (day.IsBlocked)
+                                {
+                                    <small class="status-off">Off</small>
+                                }
+                            </div>
+                            <div class="col-time">
+                                <input type="time" name="DateRows[@i].StartTime" class="form-control time-input"
+                                       data-day="@i" value="@day.StartTime" disabled="@(protectedDate || !displayEnabled)" />
+                            </div>
+                            <div class="col-time">
+                                <input type="time" name="DateRows[@i].EndTime" class="form-control time-input"
+                                       data-day="@i" value="@day.EndTime" disabled="@(protectedDate || !displayEnabled)" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-danger" onclick="showDeleteConfirm()">Delete Schedule</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bookings-card">
+        <h2>Incomplete bookings - whole week</h2>
+        <p class="section-subtitle">@(bookings?.Count ?? 0) incomplete appointment(s) &middot; completed ones are removed from this schedule</p>
+
+        @if (bookings != null && bookings.Any())
+        {
+            <div class="bookings-table">
+                <div class="bookings-header">
+                    <div>Date</div><div>Time</div><div>Customer</div><div>Service</div><div>Status</div>
+                </div>
+                @foreach (var booking in bookings)
+                {
+                    <div class="booking-row">
+                        <div>@booking.AppointmentDate.ToString("ddd dd MMM")</div>
+                        <div>@booking.StartTime.ToString(@"hh\:mm")</div>
+                        <div>@booking.Customer?.FullName</div>
+                        <div>@booking.Service?.Name</div>
+                        <div class="status-cell">
+                            <span class="status-badge incomplete">Incomplete</span>
+                            <form asp-controller="Bookings" asp-action="Complete" asp-route-id="@booking.BookingId" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                <button type="submit" class="mini-complete" title="Mark this appointment as completed">&#10003; Done</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-bookings"><p>No incomplete bookings for this week.</p></div>
+        }
+    </div>
+
+</div>
+
+<div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Delete Schedule?</h3>
+        <p>Are you sure you want to delete this stylist's schedule? This cannot be undone.</p>
+        <form asp-action="Delete" asp-route-stylistId="@Model.StylistId" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="hideDeleteConfirm()">Cancel</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn-approve {
+        background: transparent;
+        border: 1px solid #4caf50;
+        color: #4caf50;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .btn-approve:hover {
+            background: rgba(76,175,80,.15);
+        }
+
+    .btn-reject {
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .btn-reject:hover {
+            background: rgba(220,53,69,.15);
+        }
+
+    .week-toolbar {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .week-range {
+        color: #f0d06b;
+        font-size: 14px;
+        font-weight: 700;
+        margin: 4px 0 0;
+    }
+
+    .week-nav {
+        display: flex;
+        gap: 8px;
+    }
+
+        .week-nav a {
+            color: #d4af37;
+            text-decoration: none;
+            padding: 9px 12px;
+            border: 1px solid #80681b;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+            .week-nav a:hover {
+                background: #383016;
+            }
+
+    .day-full-date {
+        display: block;
+        color: #aaa;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .day-booked-note {
+        display: block;
+        color: #eac458;
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .day-past-note {
+        display: block;
+        color: #999;
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .status-off {
+        color: #ff9b9b;
+        font-size: 11px;
+        margin-left: 9px;
+    }
+
+    .blocked-week-row {
+        background: rgba(145,46,56,.07);
+    }
+
+    .toggle-switch input:disabled + .slider {
+        cursor: not-allowed;
+        opacity: .45;
+    }
+
+    @@media (max-width:700px) {
+        .days-header, .day-row {
+            grid-template-columns: 1.3fr .7fr 1fr 1fr;
+            gap: 5px;
+            padding: 10px 7px;
+        }
+
+        .time-input {
+            padding: 7px 4px;
+            font-size: 11px;
+        }
+    }
+
+    .day-specific-off {
+        display: block;
+        color: #ff9b9b;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    .edit-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 22px;
+    }
+
+    @@media (max-width:1100px) {
+        .edit-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .schedule-card, .bookings-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 28px;
+    }
+
+        .bookings-card h2 {
+            color: #d4af37;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 11px 14px;
+        background-color: #0d0d0d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+        transition: all .3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212,175,55,.15);
+        }
+
+        .form-control[readonly] {
+            color: #888;
+            cursor: not-allowed;
+        }
+
+    .days-section h2 {
+        color: #d4af37;
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+    }
+
+    .section-subtitle {
+        color: #888;
+        font-size: 12px;
+        margin: 0 0 18px 0;
+    }
+
+    .days-table {
+        background-color: #0d0d0d;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+
+    .days-header, .day-row {
+        display: grid;
+        grid-template-columns: 1.4fr .8fr 1.2fr 1.2fr;
+        gap: 12px;
+        padding: 12px 16px;
+        align-items: center;
+    }
+
+    .days-header {
+        background-color: #151515;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+        .days-header > div {
+            color: #d4af37;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+    .day-row {
+        border-bottom: 1px solid #1c1c1c;
+    }
+
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+    .day-name {
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 22px;
+    }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: #333;
+        border-radius: 22px;
+        transition: .3s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #888;
+            border-radius: 50%;
+            transition: .3s;
+        }
+
+    .toggle-switch input:checked + .slider {
+        background-color: rgba(212,175,55,.3);
+    }
+
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(18px);
+            background-color: #d4af37;
+        }
+
+    .time-input {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .bookings-table {
+        background-color: #0d0d0d;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .bookings-header, .booking-row {
+        display: grid;
+        grid-template-columns: 1.1fr .7fr 1.2fr 1.3fr 1fr;
+        gap: 10px;
+        padding: 12px 16px;
+        align-items: center;
+        font-size: 12px;
+    }
+
+    .bookings-header {
+        background-color: #151515;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+        .bookings-header > div {
+            color: #d4af37;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+    .booking-row {
+        color: #ddd;
+        border-bottom: 1px solid #1c1c1c;
+    }
+
+        .booking-row:last-child {
+            border-bottom: none;
+        }
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+        .status-badge.incomplete {
+            background-color: rgba(212,175,55,.08);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+        }
+
+    .status-cell {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .status-cell form {
+            margin: 0;
+        }
+
+    .mini-complete {
+        background: transparent;
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 14px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .mini-complete:hover {
+            background: rgba(40,167,69,.15);
+        }
+
+    .empty-bookings {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+        .empty-bookings p {
+            color: #666;
+            font-style: italic;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 11px 22px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all .3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+    .btn-danger {
+        background-color: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+    }
+
+        .modal-content h3 {
+            color: #dc3545;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .modal-content p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 22px 0;
+        }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40,167,69,.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220,53,69,.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.day-toggle').forEach(toggle => {
+        const day = toggle.getAttribute('data-target');
+        const inputs = document.querySelectorAll(`input[data-day="${day}"]`);
+        function syncTimes() {
+            inputs.forEach(input => {
+                input.disabled = toggle.disabled || !toggle.checked;
+                input.style.opacity = input.disabled ? '0.4' : '1';
+            });
+        }
+        toggle.addEventListener('change', syncTimes);
+        syncTimes();
+    });
+    function showDeleteConfirm() { document.getElementById('deleteModal').style.display = 'flex'; }
+    function hideDeleteConfirm() { document.getElementById('deleteModal').style.display = 'none'; }
+</script>

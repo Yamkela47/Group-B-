@@ -1,0 +1,79 @@
+@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+
+@{
+    ViewData["Title"] = "Set Up Stylist Account";
+    // Standalone page: no shared layout, no navigation chrome.
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Set Up Your Stylist Account - Cutting Edge</title>
+    <style>
+        body { margin: 0; min-height: 100vh; background: #141414; color: #eee; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; }
+        main { max-width: 440px; width: calc(100% - 48px); background: #202020; border: 1px solid #333; border-radius: 12px; padding: 30px; }
+        h1 { color: #d4af37; font-size: 25px; }
+        p { line-height: 1.5; color: #bbb; }
+        label { display: block; margin: 16px 0 7px; }
+        input[type=password] { width: 100%; box-sizing: border-box; padding: 12px; background: #101010; color: white; border: 1px solid #555; border-radius: 5px; }
+        button { margin-top: 22px; width: 100%; background: #d4af37; border: 0; border-radius: 5px; padding: 13px; font-weight: bold; cursor: pointer; }
+        .error { background: #482427; border: 1px solid #b14d50; border-radius: 5px; padding: 12px; color: #ffe7e7; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Welcome to Cutting Edge</h1>
+    <p>Create your password to activate your stylist account. Afterwards, sign in to the Flutter app using your email and new password.</p>
+    <div id="linkError" class="error" style="display:none" role="alert"></div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error" role="alert">@Html.ValidationSummary(true)</div>
+    }
+    <form method="post" asp-controller="Account" asp-action="AcceptStylistInvite" id="setupForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="inviteToken" name="token" value="@ViewBag.Token" />
+        <label for="newPassword">New password</label>
+        <input type="password" id="newPassword" name="newPassword" minlength="8" autocomplete="new-password" required />
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" minlength="8" autocomplete="new-password" required />
+        <button type="submit" id="submitButton">Create password</button>
+    </form>
+</main>
+
+
+
+<script>
+    (function () {
+        const fragment = new URLSearchParams(window.location.hash.substring(1));
+        const query = new URLSearchParams(window.location.search);
+        const token = fragment.get('access_token');
+        const error = fragment.get('error_description') || query.get('error_description');
+        if (token) {
+            document.getElementById('inviteToken').value = token;
+            // Clear the token from browser history after extracting it.
+            history.replaceState(null, '', window.location.pathname);
+        }
+        if (error || !document.getElementById('inviteToken').value) {
+            const message = document.getElementById('linkError');
+            message.textContent = error || 'Invalid or expired invitation link. Please request another invitation from your manager.';
+            message.style.display = 'block';
+            document.getElementById('submitButton').disabled = true;
+        }
+    }());
+</script>
+</body>
+</html>

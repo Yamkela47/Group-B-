@@ -1,0 +1,805 @@
+@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@model CuttingEdge.ManagerPortal.Models.Stylist
+
+@{
+    ViewData["Title"] = "Stylist Details";
+    Layout = "_Layout";
+    var services = ViewBag.Services as List<CuttingEdge.ManagerPortal.Models.Service> ?? new();
+    var reviews = ViewBag.Reviews as List<CuttingEdge.ManagerPortal.Models.Review> ?? new();
+    var availability = ViewBag.AvailabilityDays as List<CuttingEdge.ManagerPortal.ViewModels.StylistAvailabilityDayViewModel> ?? new();
+    var blockedDates = ViewBag.BlockedDates as List<CuttingEdge.ManagerPortal.ViewModels.ScheduleBlockedDateViewModel> ?? new();
+    var ratingSummary = ViewBag.RatingSummary as CuttingEdge.ManagerPortal.ViewModels.StylistRatingSummaryViewModel
+        ?? new CuttingEdge.ManagerPortal.ViewModels.StylistRatingSummaryViewModel();
+    var blockedCount = availability.Count(d => d.IsBlocked);
+    var workingCount = availability.Count(d => d.IsAvailable);
+    var offCount = availability.Count(d => !d.IsBlocked && !d.HasShift);
+    var unavailableCount = availability.Count(d => !d.IsBlocked && d.HasShift && !d.IsAvailable);
+}
+
+<div class="page-header">
+    <p class="breadcrumb">Stylists > Details</p>
+    <p class="subtitle">View the stylist's profile and information.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="details-layout">
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div class="profile-photo-wrapper">
+            @if (!string.IsNullOrEmpty((Model.Profile?.PhotoUrl ?? Model.PhotoUrl)))
+            {
+                <img src="@(Model.Profile?.PhotoUrl ?? Model.PhotoUrl)" alt="@Model.Profile?.FullName" class="profile-photo" />
+            }
+            else
+            {
+                <div class="profile-photo placeholder">
+                    @(Model.Profile?.FullName?.Substring(0, 1)?.ToUpper() ?? "?")
+                </div>
+            }
+        </div>
+
+        <h2 class="profile-name">@Model.Profile?.FullName</h2>
+        <p class="profile-role">@(Model.Profile?.Role ?? "Stylist")</p>
+
+        <span class="status-pill @(Model.Active ? "active" : "inactive")">
+            ● @(Model.Active ? "Active" : "Deactivated")
+        </span>
+
+        <div class="profile-actions">
+            <a asp-action="Edit" asp-route-id="@Model.StylistId" class="btn btn-primary">Edit Profile</a>
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+
+    <!-- Details Panel -->
+    <div class="details-panel">
+
+        <div class="details-section">
+            <h3>Contact Information</h3>
+
+            <div class="detail-row">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value">@Model.Profile?.FullName</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">@Model.Profile?.Email</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">@(Model.Profile?.Phone ?? "—")</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Role</span>
+                <span class="detail-value">@(Model.Profile?.Role ?? "Stylist")</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">
+                    <span class="status-badge @(Model.Active ? "active" : "inactive")">
+                        @(Model.Active ? "Active" : "Inactive")
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <!-- All-time summary, calculated from all Supabase ratings -->
+        <div class="details-section" aria-label="Stylist customer rating summary">
+            <h3>Customer Ratings Summary</h3>
+            <div class="ce-rating-overview">
+                <div class="ce-rating-score">
+                    @if (ratingSummary.TotalReviews > 0)
+                    {
+                        <strong>@ratingSummary.AverageStylistRating.ToString("0.0") <span>/ 5</span></strong>
+                        <div class="ce-rating-stars" aria-label="Star rating">★ Stylist rating</div>
+                        <small>@ratingSummary.TotalReviews customer rating(s)</small>
+                    }
+                    else
+                    {
+                        <strong>— <span>/ 5</span></strong>
+                        <small>No customer ratings yet</small>
+                    }
+                </div>
+                <div class="ce-rating-distribution" aria-label="Rating distribution">
+                    @for (var stars = 5; stars >= 1; stars--)
+                    {
+                        var count = ratingSummary.CountForStars(stars);
+                        var percentage = ratingSummary.TotalReviews > 0
+                        ? 100.0 * count / ratingSummary.TotalReviews : 0;
+                        <div class="ce-rating-bar-row">
+                            <span>@stars ★</span>
+                            <div class="ce-rating-bar-track" role="img" aria-label="@stars star ratings: @count">
+                                <div class="ce-rating-bar-fill" style="width:@(percentage.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                            </div>
+                            <span class="ce-rating-bar-count">@count</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="ce-rating-stats">
+                <div><span>Low stylist ratings (1–2 ★)</span><strong>@ratingSummary.LowRatingCount</strong></div>
+                <div>
+                    <span>Average service rating</span>
+                    <strong>@(ratingSummary.AverageServiceRating.HasValue ? $"{ratingSummary.AverageServiceRating.Value:0.0} / 5" : "Not rated")</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section">
+            <h3>Services Offered</h3>
+            <div class="services-chips">
+                @foreach (var service in services)
+                {
+                    <span class="service-chip">@service.Name</span>
+                }
+                @if (services.Count == 0)
+                {
+                    <span class="hint">No assigned services.</span>
+                }
+            </div>
+        </div>
+        <div class="details-section">
+            <h3>Upcoming Schedule &amp; Availability (Supabase)</h3>
+            <p class="ce-section-note">
+                Next 28 calendar days. Blocked dates come from <code>blocked_dates</code>;
+                working and unscheduled dates come from <code>stylist_schedules</code>.
+            </p>
+            <div class="ce-availability-stats">
+                <span class="ce-stat-work">@workingCount working</span>
+                <span class="ce-stat-blocked">@blockedCount blocked</span>
+                <span class="ce-stat-off">@offCount not scheduled</span>
+                @if (unavailableCount > 0)
+                {
+                    <span class="ce-stat-unavailable">@unavailableCount unavailable shift(s)</span>
+                }
+            </div>
+            <div class="schedule-grid">
+                @foreach (var day in availability)
+                {
+                    var statusClass = day.IsBlocked ? "blocked"
+                    : !day.HasShift ? "off"
+                    : day.IsAvailable ? "working" : "unavailable";
+                    <div class="schedule-day @statusClass">
+                        <span class="day-name">@day.Date.ToString("ddd, dd MMM yyyy")</span>
+                        @if (day.IsBlocked)
+                        {
+                            <span class="day-status">Blocked · Unavailable</span>
+                            <span class="day-reason">Reason: @day.Reason</span>
+                        }
+                        else if (!day.HasShift)
+                        {
+                            <span class="day-status">Not scheduled</span>
+                            <span class="day-reason muted">No working shift recorded</span>
+                        }
+                        else if (!day.IsAvailable)
+                        {
+                            <span class="day-status">Unavailable shift</span>
+                            <span class="day-reason muted">@day.Reason</span>
+                        }
+                        else
+                        {
+                            <span class="day-status">Working</span>
+                            <span class="day-hours">@day.Hours</span>
+                        }
+                    </div>
+                }
+                @if (availability.Count == 0)
+                {
+                    <p class="hint">No availability information could be loaded.</p>
+                }
+            </div>
+            <a asp-controller="Schedules" asp-action="Edit" asp-route-stylistId="@Model.StylistId"
+               class="btn btn-secondary" style="margin-top:14px">Open Schedule</a>
+
+            <div class="ce-leave-panel">
+                <h4>Future Blocked Dates &amp; Reasons</h4>
+                @if (blockedDates.Count > 0)
+                {
+                    <div class="ce-leave-list">
+                        @foreach (var blocked in blockedDates.OrderBy(x => x.Date))
+                        {
+                            <div class="ce-leave-item">
+                                <span>@blocked.Date.ToString("dddd, dd MMM yyyy")</span>
+                                <strong>@(string.IsNullOrWhiteSpace(blocked.Reason) ? "No reason provided" : blocked.Reason)</strong>
+                            </div>
+                        }
+                    </div>
+                    <p class="ce-leave-note">Upcoming blocked dates for the next six months.</p>
+                }
+                else
+                {
+                    <p class="hint">No future dates have been blocked by this stylist.</p>
+                }
+            </div>
+        </div>
+        <div class="details-section">
+            <h3>Recent Customer Reviews</h3>
+            <p class="ce-section-note">Latest customer comments and individual stylist/service scores.</p>
+            @foreach (var review in reviews.Take(10))
+            {
+                <div style="padding:13px 0;border-bottom:1px solid #333">
+                    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                        <strong style="color:#fff">@(review.Customer?.FullName ?? "Customer")</strong>
+                        <span style="color:#d4af37">
+                            Stylist @review.Rating / 5 ★
+                            @if (review.ServiceRating.HasValue)
+                            {
+                                <span> · Service @review.ServiceRating / 5 ★</span>
+                            }
+                        </span>
+                    </div>
+                    <small style="color:#999">@review.CreatedAt.ToString("dd MMM yyyy")</small>
+                    @if (!string.IsNullOrWhiteSpace(review.Comment))
+                    {
+                        <p style="color:#ddd">@review.Comment</p>
+                    }
+                </div>
+            }
+            @if (reviews.Count == 0)
+            {
+                <p class="hint">No reviews for this stylist yet. Customers can rate completed bookings from Flutter.</p>
+            }
+            <a asp-controller="Reviews" asp-action="Index" asp-route-stylistId="@Model.StylistId" class="btn btn-secondary" style="margin-top:12px">View All Reviews</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #0d0d0d;
+    }
+
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .breadcrumb {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .page-header h1 {
+        color: #d4af37;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin: 5px 0 0 0;
+    }
+
+    /* ===== Layout ===== */
+    .details-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+    }
+
+    @@media (max-width: 900px) {
+        .details-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== Profile Card ===== */
+    .profile-card {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 30px 20px;
+        text-align: center;
+        height: fit-content;
+    }
+
+    .profile-photo {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #d4af37;
+        margin: 0 auto 18px;
+        display: block;
+    }
+
+        .profile-photo.placeholder {
+            background-color: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4af37;
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+    .profile-name {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+    }
+
+    .profile-role {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 16px 0;
+        text-transform: capitalize;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 22px;
+    }
+
+        .status-pill.active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .status-pill.inactive {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #888;
+            border: 1px solid #555;
+        }
+
+    .profile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* ===== Details Panel ===== */
+    .details-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .details-section {
+        background-color: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 25px;
+    }
+
+        .details-section h3 {
+            color: #d4af37;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 18px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #222;
+        font-size: 14px;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        color: #888;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #ddd;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    /* ===== Service Chips ===== */
+    .services-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .service-chip {
+        background-color: rgba(212, 175, 55, 0.1);
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hint {
+        color: #666;
+        font-size: 12px;
+        font-style: italic;
+        margin: 0;
+    }
+
+    /* ===== Schedule Grid ===== */
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .schedule-day {
+        background-color: #0d0d0d;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .day-name {
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .day-hours {
+        color: #d4af37;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .day-hours.off {
+            color: #666;
+        }
+
+    /* ===== Buttons ===== */
+    .btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #d4af37;
+        color: #0d0d0d;
+    }
+
+        .btn-primary:hover {
+            background-color: #f0d060;
+            color: #0d0d0d;
+        }
+
+    .btn-secondary {
+        background-color: #333;
+        color: #fff;
+    }
+
+        .btn-secondary:hover {
+            background-color: #444;
+            color: #fff;
+        }
+
+    /* ===== Alerts ===== */
+    .alert {
+        padding: 14px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.15);
+        border: 1px solid #dc3545;
+        color: #ff6b6b;
+    }
+
+    .ce-profile-rating {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: -4px 0 21px;
+    }
+
+        .ce-profile-rating strong {
+            color: #d4af37;
+            font-size: 17px;
+        }
+
+        .ce-profile-rating small {
+            color: #999;
+            font-size: 12px;
+        }
+
+    /* ===== Stylist Rating Summary ===== */
+    .ce-rating-overview {
+        display: grid;
+        grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+        gap: 26px;
+        align-items: center;
+    }
+
+    .ce-rating-score {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .ce-rating-score strong {
+            color: #e5b93a;
+            font-size: 38px;
+            line-height: 1.1;
+        }
+
+            .ce-rating-score strong span {
+                color: #888;
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+        .ce-rating-score small {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+    .ce-rating-stars {
+        color: #d4af37;
+        letter-spacing: 3px;
+        font-size: 17px;
+    }
+
+    .ce-rating-distribution {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ce-rating-bar-row {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) 25px;
+        align-items: center;
+        gap: 10px;
+        color: #ccc;
+        font-size: 12px;
+    }
+
+    .ce-rating-bar-track {
+        height: 8px;
+        background: #333;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .ce-rating-bar-fill {
+        height: 100%;
+        background: #d4af37;
+        border-radius: 99px;
+    }
+
+    .ce-rating-bar-count {
+        text-align: right;
+        color: #aaa;
+    }
+
+    .ce-rating-stats {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px;
+    }
+
+        .ce-rating-stats > div {
+            padding: 12px 14px;
+            background: #111;
+            border: 1px solid #303030;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .ce-rating-stats span {
+            color: #aaa;
+        }
+
+        .ce-rating-stats strong {
+            color: #d4af37;
+        }
+
+    /* ===== Schedule Availability + Blocked Reasons ===== */
+    .ce-section-note {
+        font-size: 12px;
+        line-height: 1.6;
+        color: #999;
+        margin: -8px 0 15px;
+    }
+
+        .ce-section-note code {
+            color: #bcbcbc;
+        }
+
+    .ce-availability-stats {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-bottom: 14px;
+    }
+
+        .ce-availability-stats span {
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 11px;
+            border: 1px solid #454545;
+        }
+
+    .ce-stat-work {
+        color: #58cb92;
+    }
+
+    .ce-stat-blocked {
+        color: #ffa3ae;
+    }
+
+    .ce-stat-off {
+        color: #aaa;
+    }
+
+    .ce-stat-unavailable {
+        color: #ecb779;
+    }
+
+    .schedule-day.working {
+        border-left: 3px solid #28a36a;
+    }
+
+    .schedule-day.blocked {
+        border-left: 3px solid #d65d70;
+        background: #231719;
+    }
+
+    .schedule-day.off {
+        border-left: 3px solid #686868;
+        background: #121212;
+    }
+
+    .schedule-day.unavailable {
+        border-left: 3px solid #de9f49;
+        background: #211e17;
+    }
+
+    .day-status {
+        font-size: 12px;
+        color: #d4af37;
+        font-weight: 700;
+    }
+
+    .blocked .day-status, .blocked .day-reason {
+        color: #ffadb5;
+    }
+
+    .off .day-status, .off .day-reason, .unavailable .day-reason.muted {
+        color: #999;
+    }
+
+    .unavailable .day-status {
+        color: #edbd82;
+    }
+
+    .day-reason {
+        font-size: 12px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .ce-leave-panel {
+        margin-top: 22px;
+        border-top: 1px solid #353535;
+        padding-top: 19px;
+    }
+
+        .ce-leave-panel h4 {
+            color: #d4af37;
+            margin: 0 0 12px;
+            font-size: 14px;
+        }
+
+    .ce-leave-list {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #323232;
+        border-radius: 8px;
+        max-height: 265px;
+        overflow-y: auto;
+    }
+
+    .ce-leave-item {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: 11px 13px;
+        border-bottom: 1px solid #292929;
+        font-size: 12px;
+    }
+
+        .ce-leave-item:last-child {
+            border-bottom: none;
+        }
+
+        .ce-leave-item span {
+            color: #ccc;
+        }
+
+        .ce-leave-item strong {
+            color: #ffadb5;
+            font-weight: 600;
+        }
+
+    .ce-leave-note {
+        color: #777;
+        font-size: 11px;
+        margin: 10px 0 0;
+    }
+
+    @@media (max-width: 600px) {
+        .ce-rating-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .ce-rating-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

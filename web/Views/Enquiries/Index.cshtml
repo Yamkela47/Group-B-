@@ -1,0 +1,287 @@
+@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@using CuttingEdge.ManagerPortal.Models
+@model List<CuttingEdge.ManagerPortal.Models.CustomerEnquiry>
+@{
+    ViewData["Title"] = "Customer Enquiries";
+    Layout = "_Layout";
+    var selected = ViewBag.SelectedStatus as string;
+    int openCount = ViewBag.OpenCount is int open ? open : 0;
+    int repliedCount = ViewBag.RepliedCount is int replied ? replied : 0;
+    var pendingLeave = ViewBag.PendingLeaveGroups as List<LeaveRequestGroup>
+                       ?? new List<LeaveRequestGroup>();
+}
+
+<style>
+    .enq-page h1 {
+        color: #d4af37;
+        font-size: 26px;
+        margin: 0 0 7px;
+    }
+
+    .enq-muted {
+        color: #a2a2a2;
+        font-size: 13px;
+    }
+
+    .enq-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 22px 0;
+    }
+
+    .enq-filter {
+        display: inline-block;
+        padding: 11px 18px;
+        border: 1px solid #38332b;
+        border-radius: 9px;
+        color: #eee;
+        background: #1a1a1a;
+        text-decoration: none;
+    }
+
+        .enq-filter:hover, .enq-filter.selected {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+    .enq-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .enq-row {
+        display: block;
+        border: 1px solid #333;
+        background: #191919;
+        border-radius: 12px;
+        padding: 18px 20px;
+        text-decoration: none;
+        color: #eee;
+    }
+
+        .enq-row:hover {
+            border-color: #d4af37;
+            color: #eee;
+        }
+
+    .enq-row-top {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .enq-row h3 {
+        font-size: 16px;
+        margin: 6px 0 8px;
+        color: white;
+    }
+
+    .enq-row p {
+        margin: 0;
+        color: #bbb;
+        font-size: 13px;
+        line-height: 1.55;
+        white-space: normal;
+    }
+
+    .enq-small {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .enq-status {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 10px;
+        border-radius: 100px;
+        background: #41330d;
+        color: #f5ce50;
+    }
+
+        .enq-status.replied {
+            background: #163224;
+            color: #75d99d;
+        }
+
+    .enq-empty {
+        background: #181818;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        color: #aaa;
+    }
+
+    .enq-alert {
+        padding: 12px;
+        border-radius: 8px;
+        background: #342025;
+        color: #ff9ea6;
+        margin-bottom: 16px;
+    }
+
+    /* Leave Panel */
+    .leave-panel {
+        margin: 22px 0;
+        padding: 22px;
+        background: #1f1a0d;
+        border: 1px solid #d4af37;
+        border-radius: 13px;
+    }
+
+        .leave-panel h2 {
+            color: #d4af37;
+            font-size: 18px;
+            margin: 0 0 6px;
+        }
+
+        .leave-panel .lead {
+            color: #bbb;
+            font-size: 13px;
+            margin: 0 0 16px;
+        }
+
+    .leave-card {
+        background: #111;
+        border: 1px solid #3a3320;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 12px;
+    }
+
+        .leave-card .stylist {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .leave-card .range {
+            color: #f0d06b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .leave-card .reason {
+            color: #ddd;
+            font-size: 13px;
+            margin-top: 6px;
+            white-space: pre-wrap;
+        }
+
+        .leave-card .meta {
+            color: #888;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+    .btn-review {
+        display: inline-block;
+        background: transparent;
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-weight: 700;
+        text-decoration: none;
+        margin-top: 12px;
+    }
+
+        .btn-review:hover {
+            background: #d4af37;
+            color: #111;
+        }
+
+    @@media(max-width:600px) {
+        .enq-page h1 {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="enq-page">
+
+    @if (pendingLeave.Any())
+    {
+        <section class="leave-panel">
+            <h2>&#128276; Stylist leave &amp; block-date requests (@pendingLeave.Count)</h2>
+            <p class="lead">
+                Pending requests already block customers from booking. You must click Review to type a reason before approving or rejecting.
+            </p>
+
+            @foreach (var g in pendingLeave)
+            {
+                <div class="leave-card">
+                    <div class="stylist">
+                        @g.StylistName
+                        <span style="color:#888;font-weight:400;font-size:12px;">· @g.TypeLabel</span>
+                    </div>
+                    <div class="range">@g.RangeLabel</div>
+                    <div class="reason"><strong style="color:#d4af37;">Reason:</strong> @g.Reason</div>
+                    <div class="meta">Requested @g.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</div>
+
+                    <a asp-action="Details" asp-route-id="@g.EnquiryId" class="btn-review">
+                        Review &amp; Reply &rarr;
+                    </a>
+                </div>
+            }
+        </section>
+    }
+
+    <p class="enq-muted">Messages sent from the Cutting Edge Flutter app. Reply here to notify the customer directly.</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="enq-alert" role="alert">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="enq-alert" style="background:#142e21;color:#79dda0">@TempData["Success"]</div>
+    }
+
+    <div class="enq-stats">
+        <a asp-action="Index" class="enq-filter @(string.IsNullOrEmpty(selected) ? "selected" : "")">All messages</a>
+        <a asp-action="Index" asp-route-status="open" class="enq-filter @(selected == "open" ? "selected" : "")">Awaiting reply (@openCount)</a>
+        <a asp-action="Index" asp-route-status="replied" class="enq-filter @(selected == "replied" ? "selected" : "")">Replied (@repliedCount)</a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="enq-empty">There are no customer messages in this view.</div>
+    }
+    else
+    {
+        <div class="enq-list">
+            @foreach (var item in Model)
+            {
+                <a class="enq-row" asp-controller="Enquiries" asp-action="Details" asp-route-id="@item.EnquiryId">
+                    <div class="enq-row-top">
+                        <span class="enq-small">@item.CustomerName · @item.Category · @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+                        <span class="enq-status @(item.Status == "replied" ? "replied" : "")">
+                            @(item.Status == "replied" ? "Replied" : "Awaiting reply")
+                        </span>
+                    </div>
+                    <h3>@item.Subject</h3>
+                    @{
+                        var shownMessage = System.Text.RegularExpressions.Regex.Replace(item.Message, @"^\s*Stylist ID:\s*\d+\s*\|\s*", "");
+                    }
+                    <p>@(shownMessage.Length > 230 ? shownMessage[..230] + "…" : shownMessage)</p>
+                </a>
+            }
+        </div>
+    }
+</div>

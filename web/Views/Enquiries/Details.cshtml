@@ -1,0 +1,272 @@
+@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@model CuttingEdge.ManagerPortal.Models.CustomerEnquiry
+@{
+    ViewData["Title"] = "Customer Message";
+    Layout = "_Layout";
+    var leaveGroupId = ViewBag.LeaveGroupId as Guid?;
+    var isLeaveRequest = Model.Category == "stylist_leave_request";
+}
+
+<style>
+    .enq-detail {
+        max-width: 970px;
+    }
+
+    .enq-back {
+        color: #d4af37;
+        display: inline-block;
+        text-decoration: none;
+        margin-bottom: 16px;
+    }
+
+    .enq-detail h1 {
+        color: #d4af37;
+        margin: 0 0 6px;
+        font-size: 25px;
+    }
+
+    .enq-panel {
+        background: #191919;
+        border: 1px solid #353535;
+        border-radius: 13px;
+        padding: 23px;
+        margin: 20px 0;
+    }
+
+        .enq-panel h2 {
+            color: #d4af37;
+            font-size: 17px;
+            margin: 0 0 18px;
+        }
+
+    .enq-meta {
+        color: #aaa;
+        font-size: 13px;
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 10px;
+    }
+
+        .enq-meta strong {
+            color: white;
+            font-weight: 550;
+            overflow-wrap: anywhere;
+        }
+
+    .enq-content {
+        margin-top: 21px;
+        padding: 17px;
+        border-left: 3px solid #d4af37;
+        background: #101010;
+        color: #f0f0f0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.65;
+    }
+
+    .enq-detail textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        background: #090909;
+        color: white;
+        border: 1px solid #55471d;
+        border-radius: 9px;
+        padding: 14px;
+        font: inherit;
+    }
+
+        .enq-detail textarea:focus {
+            outline: 2px solid #d4af37;
+        }
+
+    .enq-send {
+        background: #d4af37;
+        color: #0b0b0b;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 800;
+        cursor: pointer;
+        padding: 12px 22px;
+        margin-top: 14px;
+    }
+
+    .enq-hint {
+        color: #999;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .enq-alert {
+        border-radius: 8px;
+        padding: 13px;
+        margin: 10px 0;
+        background: #382124;
+        color: #ff9fa6;
+    }
+
+        .enq-alert.ok {
+            background: #143424;
+            color: #80dea7;
+        }
+
+    /* Leave Action Buttons */
+    .leave-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .btn-approve {
+        background: #4caf50;
+        color: white;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 800;
+        cursor: pointer;
+        padding: 12px 24px;
+        flex: 1;
+        transition: 0.2s;
+    }
+
+        .btn-approve:hover:not(:disabled) {
+            background: #45a049;
+        }
+
+    .btn-reject {
+        background: #dc3545;
+        color: white;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 800;
+        cursor: pointer;
+        padding: 12px 24px;
+        flex: 1;
+        transition: 0.2s;
+    }
+
+        .btn-reject:hover:not(:disabled) {
+            background: #c82333;
+        }
+
+        .btn-approve:disabled, .btn-reject:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+    @@media(max-width:600px) {
+        .enq-meta {
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+
+        .leave-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="enq-detail">
+    <a class="enq-back" asp-action="Index">← Back to all enquiries</a>
+    <h1>@(isLeaveRequest ? "Stylist Leave Request" : "Customer Message")</h1>
+    <p style="color:#999;margin-top:0">@Model.Category · Received @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="enq-alert ok" role="status">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="enq-alert" role="alert">@TempData["Error"]</div>
+    }
+
+    <section class="enq-panel">
+        <h2>Request Details</h2>
+        <div class="enq-meta">
+            <span>Stylist</span><strong>@Model.CustomerName</strong>
+            <span>Email</span><strong>@Model.CustomerEmail</strong>
+            <span>Status</span><strong>@(Model.Status == "replied" ? "Resolved" : "Awaiting Decision")</strong>
+        </div>
+        <div class="enq-content">@System.Text.RegularExpressions.Regex.Replace(Model.Message, @"^\s*Stylist ID:\s*\d+\s*\|\s*", "")</div>
+    </section>
+
+    <section class="enq-panel">
+        <h2>Manager Action</h2>
+
+        @if (Model.Status == "replied")
+        {
+            <div class="enq-content">@Model.ManagerReply</div>
+            <p class="enq-hint">Decision made on @(Model.RepliedAt.HasValue? Model.RepliedAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "Unknown").</p>
+        }
+        else if (isLeaveRequest)
+        {
+            @if (leaveGroupId.HasValue && leaveGroupId.Value != Guid.Empty)
+            {
+                <p class="enq-hint" style="margin-bottom: 15px;">
+                    You must write a reply below before you can approve or reject this request.<br />
+                    <strong>Approving</strong> keeps the dates blocked.<br />
+                    <strong>Rejecting</strong> removes the blocks and makes the stylist available again.
+                </p>
+
+                <form id="leaveReviewForm" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="groupId" value="@leaveGroupId.Value" />
+                    <input type="hidden" name="enquiryId" value="@Model.EnquiryId" />
+
+                    <label for="managerNote" style="color:#d4af37; display:block; margin-bottom:7px; font-weight:bold;">Reply / Reason for Decision</label>
+                    <textarea id="managerNote" name="managerNote" maxlength="1000" required
+                      placeholder="Explain your decision here. This will be sent to the stylist in their Flutter app..."
+                      oninput="toggleLeaveButtons()"></textarea>
+
+                    <div class="leave-actions">
+                        <button type="submit" formaction="@Url.Action("ApproveLeave", "Enquiries")" id="btnApprove" class="btn-approve" disabled onclick="return confirm('Approve this leave? The dates will stay blocked.');">
+                            ✔ Approve Leave
+                        </button>
+                        <button type="submit" formaction="@Url.Action("RejectLeave", "Enquiries")" id="btnReject" class="btn-reject" disabled onclick="return confirm('Reject this leave? The dates will become bookable again.');">
+                            ✖ Reject Leave
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <p style="color:#ff9fa6;">This leave request is either already processed or missing its grouping ID in the database.</p>
+            }
+        }
+        else
+        {
+            <p class="enq-hint">Your reply will be saved in Supabase and sent to this customer's Notifications screen.</p>
+            <form asp-action="Reply" asp-route-id="@Model.EnquiryId" method="post">
+                @Html.AntiForgeryToken()
+                <label for="replyMessage" style="color:#fff;display:block;margin:13px 0 7px">Message to customer</label>
+                <textarea id="replyMessage" name="replyMessage" maxlength="5000" required placeholder="Write your reply here..."></textarea>
+                <button type="submit" class="enq-send" onclick="return confirm('Send this reply to the customer?');">Send Reply &amp; Notify Customer</button>
+            </form>
+        }
+    </section>
+</div>
+
+<script>
+    function toggleLeaveButtons() {
+        const note = document.getElementById('managerNote').value.trim();
+        const btnApprove = document.getElementById('btnApprove');
+        const btnReject = document.getElementById('btnReject');
+
+        const isDisabled = note.length === 0;
+
+        if (btnApprove) btnApprove.disabled = isDisabled;
+        if (btnReject) btnReject.disabled = isDisabled;
+    }
+</script>

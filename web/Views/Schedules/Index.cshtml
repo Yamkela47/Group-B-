@@ -1,0 +1,465 @@
+@* ============================================================
+   PROJECT: Cutting Edge Salon
+   STUDENT DETAILS:
+   ------------------------------------------------------------
+   Name                  | Student Number
+   ------------------------------------------------------------
+   Goitse Kgwele         | 221050663
+   Thabang Zitha         | 223007074
+   Yamkela Mazamani      | 224007421
+   Nyakallo Pali         | 223060226
+   Bennet Linda          | 224004294
+   ============================================================ *@
+
+@model CuttingEdge.ManagerPortal.ViewModels.ScheduleCalendarViewModel
+
+@{
+    ViewData["Title"] = "Stylist Schedule Calendar";
+    Layout = "_Layout";
+
+    var first = Model.Month == default
+        ? new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1)
+        : Model.Month;
+
+    var offset = ((int)first.DayOfWeek + 6) % 7;
+    var next = first.AddMonths(1);
+    var previous = first.AddMonths(-1);
+}
+
+<div class="ce-calendar-top">
+    <div>
+        <p>
+            View stylist working shifts and appointments.
+            Schedule information is loaded from Supabase.
+        </p>
+    </div>
+
+    <a asp-action="Add" class="ce-gold-button">
+        + Add Schedule
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <p class="ce-alert">@Model.Error</p>
+}
+
+@if (TempData["Error"] != null)
+{
+    <p class="ce-alert">@TempData["Error"]</p>
+}
+
+@if (TempData["Success"] != null)
+{
+    <p class="ce-success">@TempData["Success"]</p>
+}
+
+<!-- Calendar Toolbar -->
+<div class="ce-calendar-toolbar">
+
+    <div class="ce-month-controls">
+
+        <a asp-action="Index"
+           asp-route-month="@previous.ToString("yyyy-MM")"
+           asp-route-stylistId="@Model.SelectedStylistId"
+           aria-label="Previous month">
+            ‹
+        </a>
+
+        <h2>@first.ToString("MMMM yyyy")</h2>
+
+        <a asp-action="Index"
+           asp-route-month="@next.ToString("yyyy-MM")"
+           asp-route-stylistId="@Model.SelectedStylistId"
+           aria-label="Next month">
+            ›
+        </a>
+
+        <a asp-action="Index"
+           asp-route-stylistId="@Model.SelectedStylistId"
+           class="ce-today-link">
+            Current month
+        </a>
+
+    </div>
+
+    <!-- Filter Stylists -->
+    <form method="get"
+          asp-action="Index"
+          class="ce-filter-form">
+
+        <input type="hidden"
+               name="month"
+               value="@first.ToString("yyyy-MM")" />
+
+        <label for="ceStylistSelector">
+            Filter stylist
+
+            <select id="ceStylistSelector"
+                    name="stylistId"
+                    onchange="this.form.submit()">
+
+                <option value="">All stylists</option>
+
+                @foreach (var stylist in Model.Stylists)
+                {
+                    if (Model.SelectedStylistId == stylist.StylistId)
+                    {
+                        <option value="@stylist.StylistId" selected>
+                            @stylist.Profile?.FullName
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@stylist.StylistId">
+                            @stylist.Profile?.FullName
+                        </option>
+                    }
+                }
+
+            </select>
+        </label>
+
+    </form>
+</div>
+
+<!-- Calendar -->
+<div class="ce-calendar-scroll">
+
+    <div class="ce-calendar-grid">
+
+        @foreach (var weekday in new[]
+                {
+                "Mon", "Tue", "Wed", "Thu",
+                "Fri", "Sat", "Sun"
+                })
+        {
+            <div class="ce-week-heading">
+                @weekday
+            </div>
+        }
+
+        @for (var blank = 0; blank < offset; blank++)
+        {
+            <div class="ce-date-cell ce-outside"
+                 aria-hidden="true">
+            </div>
+        }
+
+        @foreach (var day in Model.Days)
+        {
+            <div class="ce-date-cell @(day.Date.Date == DateTime.Today ? "ce-current-date" : "")">
+
+                <!-- Date -->
+                <div class="ce-date-number">
+
+                    <strong>@day.Date.Day</strong>
+
+                    @if (day.ActiveBookings > 0)
+                    {
+                        <small>
+                            @day.ActiveBookings booked
+                        </small>
+                    }
+
+                </div>
+
+                <!-- Do not label blocked leave dates as empty days. -->
+                @if (day.Shifts.Count == 0 && day.BlockedDates.Count == 0)
+                {
+                    <span class="ce-off-label">
+                        No shifts scheduled
+                    </span>
+                }
+
+                <!-- Stylist Working Shifts -->
+                @foreach (var shift in day.Shifts)
+                {
+                    // The reason is saved by Flutter in public.blocked_dates.reason
+                    // and is already included in day.BlockedDates by SupabaseService.
+                    var blockedDate = day.BlockedDates.FirstOrDefault(
+                    b => b.StylistId == shift.StylistId);
+                    var isUnavailable = blockedDate != null || !shift.IsAvailable;
+                    var unavailableReason = blockedDate == null || string.IsNullOrWhiteSpace(blockedDate.Reason)
+                    ? "Not recorded"
+                    : blockedDate.Reason.Trim();
+
+                    <a asp-action="Edit"
+                       asp-route-stylistId="@shift.StylistId"
+                       class="ce-shift @(shift.BookingCount > 0 ? "ce-has-booking" : "") @(isUnavailable ? "ce-shift-blocked" : "")"
+                       data-stylist="@shift.StylistId">
+
+                        <span class="ce-shift-name">@shift.StylistName</span>
+                        <span>@shift.Hours</span>
+
+                        @if (isUnavailable)
+                        {
+                            <span class="ce-warning-text">Unavailable</span>
+                            <span class="ce-unavailable-reason">
+                                <strong>Reason:</strong> @unavailableReason
+                            </span>
+                        }
+
+                        @if (shift.BookingCount > 0)
+                        {
+                            <span>
+                                @shift.BookingCount appointment(s)
+                                — protected
+                            </span>
+                        }
+                    </a>
+                }
+
+                <!-- A blocked date may have no corresponding work shift. -->
+                @foreach (var blockedDate in day.BlockedDates.Where(
+                            b => !day.Shifts.Any(s => s.StylistId == b.StylistId)))
+                {
+                    var unavailableReason = string.IsNullOrWhiteSpace(blockedDate.Reason)
+                    ? "Not recorded"
+                    : blockedDate.Reason.Trim();
+
+                    <a asp-action="Edit"
+                       asp-route-stylistId="@blockedDate.StylistId"
+                       class="ce-shift ce-shift-blocked ce-blocked-day"
+                       data-stylist="@blockedDate.StylistId">
+
+                        <span class="ce-shift-name">@blockedDate.StylistName</span>
+                        <span class="ce-warning-text">Unavailable (full day)</span>
+                        <span class="ce-unavailable-reason">
+                            <strong>Reason:</strong> @unavailableReason
+                        </span>
+                    </a>
+                }
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+
+    .ce-calendar-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+        .ce-calendar-top h1 {
+            color: #d4af37;
+            font-size: 28px;
+            margin: 0 0 5px;
+        }
+
+        .ce-calendar-top p {
+            color: #999;
+            font-size: 13px;
+        }
+
+    .ce-gold-button {
+        background: #d4af37;
+        color: #0d0d0d;
+        padding: 11px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+        .ce-gold-button:hover {
+            background: #f0ce58;
+            color: #0d0d0d;
+        }
+
+    /* Calendar Toolbar */
+
+    .ce-calendar-toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .ce-month-controls {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+        .ce-month-controls h2 {
+            font-size: 20px;
+            color: #fff;
+            min-width: 170px;
+            text-align: center;
+            margin: 0;
+        }
+
+        .ce-month-controls > a {
+            color: #d4af37;
+            border: 1px solid #705913;
+            border-radius: 7px;
+            padding: 8px 12px;
+            text-decoration: none;
+        }
+
+        .ce-month-controls .ce-today-link {
+            font-size: 12px;
+        }
+
+    /* Stylist Filter */
+
+    .ce-calendar-toolbar label {
+        color: #d4af37;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .ce-calendar-toolbar select {
+        display: block;
+        background: #1a1a1a;
+        border: 1px solid #444;
+        border-radius: 7px;
+        padding: 9px;
+        color: white;
+        margin-top: 5px;
+        min-width: 190px;
+    }
+
+    /* Calendar Layout */
+
+    .ce-calendar-scroll {
+        overflow-x: auto;
+        border: 1px solid #333;
+        border-radius: 12px;
+        background: #141414;
+    }
+
+    .ce-calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(145px, 1fr));
+        min-width: 1015px;
+    }
+
+    .ce-week-heading {
+        padding: 13px 10px;
+        background: #211b0d;
+        color: #d4af37;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        border-right: 1px solid #333;
+    }
+
+    /* Calendar Dates */
+
+    .ce-date-cell {
+        border-right: 1px solid #303030;
+        border-top: 1px solid #303030;
+        min-height: 145px;
+        padding: 10px;
+        background: #191919;
+    }
+
+        .ce-date-cell.ce-outside {
+            background: #101010;
+        }
+
+        .ce-date-cell.ce-current-date {
+            box-shadow: inset 0 0 0 2px #d4af37;
+        }
+
+    .ce-date-number {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #eee;
+    }
+
+        .ce-date-number strong {
+            font-size: 17px;
+        }
+
+        .ce-date-number small {
+            color: #e5bf43;
+            font-size: 10px;
+        }
+
+    /* Stylist Shifts */
+
+    .ce-shift {
+        display: flex;
+        flex-direction: column;
+        background: #262626;
+        border-left: 3px solid #1faa65;
+        border-radius: 5px;
+        color: #ccc;
+        font-size: 11px;
+        padding: 7px;
+        margin-bottom: 5px;
+        text-decoration: none;
+        line-height: 1.45;
+        gap: 2px;
+    }
+
+        .ce-shift:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .ce-shift.ce-has-booking {
+            border-left-color: #d4af37;
+            background: #302818;
+        }
+
+    .ce-shift-name {
+        font-weight: 700;
+        color: white;
+    }
+
+    /* Unavailable Shift */
+
+    .ce-shift.ce-shift-blocked {
+        opacity: 0.65;
+        border-left-color: #dd686f;
+    }
+
+    .ce-warning-text {
+        color: #ff9b9b;
+    }
+
+    .ce-off-label {
+        color: #777;
+        font-size: 11px;
+    }
+
+    /* Alerts */
+
+    .ce-alert {
+        color: #f99;
+        background: #351719;
+        padding: 12px;
+        border-radius: 7px;
+    }
+
+    .ce-success {
+        color: #9eecbb;
+        background: #15361f;
+        padding: 12px;
+        border-radius: 7px;
+    }
+
+</style>
+
+<script>
+    // Refresh the calendar every 60 seconds
+    // to display the latest Supabase schedule changes.
+
+    window.setTimeout(() => {
+        window.location.reload();
+    }, 60000);
+</script>
