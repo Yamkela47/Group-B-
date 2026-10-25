@@ -65,7 +65,7 @@ public class StylistsController : Controller
     public async Task<IActionResult> Create()
     {
         ViewBag.Services = await _supabaseService.GetAllServicesAsync();
-        return View();
+        return View(new StylistViewModel());
     }
 
     // POST: /Stylists/Create
@@ -73,29 +73,58 @@ public class StylistsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(StylistViewModel model, IFormFile? photoFile)
     {
+        // Validate the weekly hours before anything is created.
+        if (model.WeekSchedule.Count > 0)
+        {
+            if (!model.WeekSchedule.Values.Any(d => d.Enabled))
+                ModelState.AddModelError("", "Select at least one working day for this stylist.");
+
+            foreach (var (day, d) in model.WeekSchedule)
+            {
+                if (!d.Enabled) continue;
+                if (!TimeSpan.TryParse(d.StartTime, System.Globalization.CultureInfo.InvariantCulture, out var start) ||
+                    !TimeSpan.TryParse(d.EndTime, System.Globalization.CultureInfo.InvariantCulture, out var finish) ||
+                    finish <= start)
+                    ModelState.AddModelError("", $"{day}: the end time must be after the start time.");
+            }
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
-                await _supabaseService.CreateStylistAsync(model);
+                var created = await _supabaseService.CreateStylistAsync(model);
+                var warnings = new List<string>();
+
                 if (photoFile != null && photoFile.Length > 0)
                 {
                     // Images are saved under catalog-images/stylists/<profile-id>/.
                     try
                     {
-                        var created = await _supabaseService.GetProfileByEmailAsync(model.Email);
-                        if (created != null)
-                            await _supabaseService.UploadProfilePhotoAsync(created.Id, photoFile, "stylists");
+                        var profile = await _supabaseService.GetProfileByEmailAsync(model.Email);
+                        if (profile != null)
+                            await _supabaseService.UploadProfilePhotoAsync(profile.Id, photoFile, "stylists");
                     }
                     catch (Exception photoError)
                     {
                         // The account is already created; never report creation failed.
-                        TempData["Warning"] = "The stylist was created but their photo could not be uploaded: " + photoError.Message;
+                        warnings.Add("The stylist was created but their photo could not be uploaded: " + photoError.Message);
                     }
                 }
-                TempData["Success"] = string.IsNullOrWhiteSpace(model.InitialPassword)
-                    ? "Stylist added. A password setup invitation was sent by Supabase."
-                    : "Stylist added. They can sign in to Flutter using the email and initial password you provided.";
+
+                if (created.CredentialsEmailed)
+                {
+                    TempData["Success"] = "Stylist added. Their login email and password were sent to " + model.Email.Trim() + ".";
+                }
+                else
+                {
+                    TempData["Success"] = "Stylist added.";
+                    warnings.Add("The login email could not be sent (" + created.EmailError + "). " +
+                                 "Give the stylist this temporary password privately: " + created.TemporaryPassword);
+                }
+
+                if (warnings.Count > 0)
+                    TempData["Warning"] = string.Join(" ", warnings);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
