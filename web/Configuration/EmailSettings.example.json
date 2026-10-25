@@ -1,6 +1,6 @@
 {
   "Email": {
-    "SmtpHost": "smtp.gmail.com",
+    "SmtpHost": "",
     "SmtpPort": "587",
     "SmtpUser": "frameworkfanatic@gmail.com",
     "SmtpPass": "oaxnglcofclybkjl",
