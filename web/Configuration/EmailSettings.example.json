@@ -2,7 +2,7 @@
   "Email": {
     "SmtpHost": "",
     "SmtpPort": "587",
-    "SmtpUser": "frameworkfanatic@gmail.com",
+    "SmtpUser": "",
     "SmtpPass": "oaxnglcofclybkjl",
     "FromEmail": "frameworkfanatic@gmail.com",
     "FromName": "Cutting Edge Salon",
