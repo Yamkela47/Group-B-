@@ -1,4 +1,4 @@
-﻿@* ============================================================
+@* ============================================================
    PROJECT: Cutting Edge Salon
    STUDENT DETAILS:
    ------------------------------------------------------------
@@ -114,29 +114,13 @@
             </div>
         </div>
 
-        <!-- Working Hours & Role -->
+        <!-- Working Hours -->
         <div class="form-section">
-            <h2>Working Hours & Role</h2>
+            <h2>Working Hours</h2>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Working Hours</label>
-                    <input asp-for="WorkingHours" class="form-control" placeholder="Mon–Sat, 09:00 – 17:00" />
-                </div>
-
-                <div class="form-group">
-                    <label>Role <span class="required">*</span></label>
-                    <div class="role-toggle">
-                        <label class="role-option">
-                            <input type="radio" name="Role" value="Stylist" checked="@(Model.Role == "Stylist")" />
-                            <span class="role-pill">Stylist</span>
-                        </label>
-                        <label class="role-option">
-                            <input type="radio" name="Role" value="Manager" checked="@(Model.Role == "Manager")" />
-                            <span class="role-pill">Manager</span>
-                        </label>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>Working Hours</label>
+                <input asp-for="WorkingHours" class="form-control" placeholder="Mon–Sat, 09:00 – 17:00" />
             </div>
         </div>
 
@@ -447,9 +431,9 @@
         position: relative;
     }
 
-    .password-input-wrap .form-control {
-        padding-right: 75px;
-    }
+        .password-input-wrap .form-control {
+            padding-right: 75px;
+        }
 
     .password-visibility-btn {
         position: absolute;
@@ -466,10 +450,10 @@
         cursor: pointer;
     }
 
-    .password-visibility-btn:focus-visible {
-        outline: 2px solid #f0d060;
-        outline-offset: 2px;
-    }
+        .password-visibility-btn:focus-visible {
+            outline: 2px solid #f0d060;
+            outline-offset: 2px;
+        }
 
     .form-row {
         display: grid;
@@ -539,49 +523,6 @@
         .chip-select-all:hover {
             background-color: rgba(212, 175, 55, 0.1);
         }
-
-    /* ===== Role Toggle ===== */
-    .role-toggle {
-        display: flex;
-        gap: 10px;
-    }
-
-    .role-option {
-        cursor: pointer;
-        flex: 1;
-    }
-
-        .role-option input {
-            display: none;
-        }
-
-    .role-pill {
-        display: block;
-        padding: 12px 20px;
-        border-radius: 24px;
-        background-color: #0d0d0d;
-        border: 1px solid #444;
-        color: #aaa;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .role-option input:checked + .role-pill {
-        background-color: #d4af37;
-        border-color: #d4af37;
-        color: #0d0d0d;
-    }
-
-    .role-option:hover .role-pill {
-        border-color: #d4af37;
-        color: #d4af37;
-    }
-
-    .role-option input:checked:hover + .role-pill {
-        color: #0d0d0d;
-    }
 
     /* ===== Checkbox ===== */
     .checkbox-group {
