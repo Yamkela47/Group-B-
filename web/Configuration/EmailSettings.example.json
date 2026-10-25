@@ -4,7 +4,7 @@
     "SmtpPort": "",
     "SmtpUser": "",
     "SmtpPass": "",
-    "FromEmail": "frameworkfanatic@gmail.com",
+    "FromEmail": "",
     "FromName": "Cutting Edge Salon",
     "RecoveryCodeSecret": "sb_secret_QJALO49kATK30GW89N58aA_cmMm6csy"
   },
