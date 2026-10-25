@@ -48,15 +48,35 @@
             }
 
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control"
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control"
                        placeholder="manager@example.com" required />
             </div>
 
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control"
-                       placeholder="••••••••" required />
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="••••••••" required />
+                    <button type="button" id="togglePassword" class="toggle-password"
+                            aria-label="Show password" aria-pressed="false">
+                        <!-- Eye (shown when password is hidden) -->
+                        <svg id="eyeOpen" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <!-- Eye with slash (shown when password is visible) -->
+                        <svg id="eyeClosed" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             style="display:none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
@@ -196,6 +216,36 @@
             color: #555;
         }
 
+    /* ===== Show/Hide Password ===== */
+    .password-wrapper {
+        position: relative;
+    }
+
+        .password-wrapper .form-control {
+            padding-right: 48px; /* keeps text from sliding under the icon */
+        }
+
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 4px;
+        color: #d4af37;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: color 0.3s ease;
+    }
+
+        .toggle-password:hover,
+        .toggle-password:focus-visible {
+            color: #f0d060;
+            outline: none;
+        }
+
     .btn-primary {
         width: 100%;
         padding: 14px;
@@ -263,3 +313,23 @@
         border-radius: 8px;
         font-size: 14px;
     }</style>
+
+<script>
+    (function () {
+        var passwordInput = document.getElementById('password');
+        var toggleBtn = document.getElementById('togglePassword');
+        var eyeOpen = document.getElementById('eyeOpen');
+        var eyeClosed = document.getElementById('eyeClosed');
+
+        toggleBtn.addEventListener('click', function () {
+            var showing = passwordInput.type === 'text';
+
+            passwordInput.type = showing ? 'password' : 'text';
+            eyeOpen.style.display = showing ? 'block' : 'none';
+            eyeClosed.style.display = showing ? 'none' : 'block';
+
+            toggleBtn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            toggleBtn.setAttribute('aria-pressed', showing ? 'false' : 'true');
+        });
+    })();
+</script>
