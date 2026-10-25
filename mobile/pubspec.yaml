@@ -1,0 +1,54 @@
+name: cutting_edge
+description: Cutting Edge Salon Management & Booking System
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  supabase_flutter: ^2.18.3
+  url_launcher: ^6.3.0
+  http: ^1.2.0
+  universal_html: ^2.2.4
+  image_picker: ^1.1.2   
+  path_provider: ^2.1.6
+  share_plus: ^13.3.1
+  mailer: ^6.0.1        
+   #Packages for generating and saving the PDF receipts
+  pdf: ^3.10.8
+  printing: ^5.11.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  # Package to generate app icons automatically
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+# =========================================================
+# CONFIGURATION FOR APP ICONS
+# =========================================================
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  # Make sure your logo is named exactly this in your assets folder
+  image_path: "assets/images/logo.jpeg" 
+  web:
+    generate: true
+    image_path: "assets/images/logo.jpeg"
+    background_color: "#000000"
+    theme_color: "#E8C158"
+  windows:
+    generate: true
+    image_path: "assets/images/logo.jpeg"
+    icon_size: 48
