@@ -5,7 +5,7 @@
     "SmtpUser": "",
     "SmtpPass": "",
     "FromEmail": "",
-    "FromName": "Cutting Edge Salon",
+    "FromName": "",
     "RecoveryCodeSecret": "sb_secret_QJALO49kATK30GW89N58aA_cmMm6csy"
   },
   "Supabase": {
